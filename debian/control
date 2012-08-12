@@ -1,0 +1,42 @@
+Source: pandaseq-sam
+Section: science
+Maintainer: Andre Masella <andre@masella.name>
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, zlib1g-dev, pandaseq-dev (>= 2.1~), libtool
+Priority: extra
+Standards-Version: 3.9.1
+Homepage: http://github.com/neufeld/pandaseq-sam
+
+Package: pandaseq-sam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pandaseq
+Description: Pair-end read assembler
+ PANDA assembles forward and reverse reads from Illumina SAM/BAM data
+
+Package: libpandaseq-sam0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Pair-end read assembler
+ PANDA assembles forward and reverse reads from Illumina SAM/BAM data
+
+Package: pandaseq-sam-dev
+Architecture: any
+Depends: ${misc:Depends}, libpandaseq-sam0 (= ${binary:Version}), pandaseq-dev, libtool
+Description: Pair-end read assembler -- Development tools
+ PANDA assembles forward and reverse reads from Illumina SAM/BAM data
+ .
+ This package contains headers for using the library. If you are only
+ assembling sequences, this is not necessary.
+
+Package: pandaseq-sam-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends:
+    pandaseq-sam (= ${binary:Version}),
+    ${misc:Depends}
+Description: Pair-end read assembler -- Debugging symbols
+ PANDA assembles forward and reverse reads from Illumina SAM/BAM data
+ .
+ This package contains debugging symbols.  If you are only assembling
+ sequences, this is not necessary.
+

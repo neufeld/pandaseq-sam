@@ -1,0 +1,61 @@
+.\" Authors: Andre Masella
+.TH pandaseq-sam 1 "August 2012" "1.0" "USER COMMANDS"
+.SH NAME 
+pandaseq \- PAired-eND Assembler for DNA sequences from SAM/BAM files
+.SH SYNOPSIS
+.B pandaseq
+.B \-f
+.I file.bam
+[
+.B \-6 
+] [
+.B \-b 
+] [
+.B \-C
+.I module
+] [
+.B \-d
+.I flags
+] [
+.B \-F 
+] [
+.B \-l
+.I minlen
+] [
+.B \-L
+.I maxlen
+] [
+.B \-N 
+] [
+.B \-o 
+.I minoverlap
+] [
+.B \-p
+.I forwardprimer
+] [
+.B \-q
+.I reverseprimer 
+] [
+.B \-t
+.I threshold
+] [
+.B \-T
+.I threads
+]
+.SH DESCRIPTION
+PANDASEQ assembles paired-end Illumina reads into sequences, trying to correct for errors and uncalled bases. The assembler reads the sequences in SAM/BAM format with quality information. For more information, see
+.BR pandaseq (1).
+.SH OPTIONS
+All parameters not listed here are identical to their
+.BR pandaseq (1)
+versions.
+.TP
+\-b
+Input file is in binary (BAM), rather than text (SAM) format.
+.TP
+\-f file.sam
+The location of the reads in SAM or BAM format. Use \fB-\fR to read from standard input.
+
+.SH SEE ALSO
+.BR pandaseq (1),
+.BR pandaxs (1).

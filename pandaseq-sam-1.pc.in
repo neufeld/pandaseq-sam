@@ -1,0 +1,15 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+bindir=@bindir@
+includedir=@includedir@/pandaseq-sam-1
+datarootdir=@datarootdir@
+datadir=@datadir@
+vapidir=@datadir@/vala/vapi
+
+Name: PANDAseq-SAM
+Description: Assemble forward and reverse reads from Illumina SAM/BAM data
+Version: @VERSION@
+Requires: pandaseq
+Libs: -L${libdir} -lpandaseq-sam
+Cflags: -I${includedir}

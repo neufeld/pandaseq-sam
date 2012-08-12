@@ -1,0 +1,5 @@
+pandaseq-sam (1.0~ppa0) lucid; urgency=low
+
+  * PANDAseq extentions to support SAM/BAM files
+
+ -- Andre Masella <andre@masella.name>  Sun, 12 Aug 2012 11:17:33 -0700
