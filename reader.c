@@ -33,6 +33,8 @@ struct reader_data {
 	size_t reverse_length;
 	panda_qual forward[PANDA_MAX_LEN];
 	panda_qual reverse[PANDA_MAX_LEN];
+	char tag[PANDA_TAG_LEN];
+	size_t tag_length;
 };
 
 bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_length, panda_qual **reverse, size_t *reverse_length, struct reader_data *data) {
@@ -72,6 +74,7 @@ bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_len
 				}
 				return false;
 			}
+			memcpy(id->tag, data->tag, data->tag_length + 1);
 
 			if (seq->core.flag & BAM_FREAD1) {
 				bam_forward = seq;
@@ -116,7 +119,7 @@ void ps_destroy(struct reader_data *data) {
 	free(data);
 }
 
-PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *logger_data, bool binary, unsigned char qualmin, void **user_data, PandaDestroy *destroy) {
+PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *logger_data, bool binary, char *tag, unsigned char qualmin, void **user_data, PandaDestroy *destroy) {
 	struct reader_data *data;
 
 	*destroy = NULL;
@@ -135,6 +138,16 @@ PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *l
 	data->qualmin = qualmin;
 	data->pool = kh_init(seq);
 	data->qualmin = qualmin;
+	if (tag == NULL) {
+		data->tag[0] = '\0';
+	} else {
+		data->tag_length = strlen(tag);
+		if (data->tag_length >= PANDA_TAG_LEN) {
+			data->tag_length = PANDA_TAG_LEN - 1;
+		}
+		memcpy(data->tag, tag, data->tag_length);
+		data->tag[data->tag_length] = '\0';
+	}
 	*destroy = (PandaDestroy)ps_destroy;
 	*user_data = data;
 	return (PandaNextSeq) ps_next;

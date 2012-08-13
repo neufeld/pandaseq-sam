@@ -11,6 +11,9 @@ pandaseq \- PAired-eND Assembler for DNA sequences from SAM/BAM files
 ] [
 .B \-b 
 ] [
+.B \-B
+.I barcode
+] [
 .B \-C
 .I module
 ] [
@@ -52,6 +55,9 @@ versions.
 .TP
 \-b
 Input file is in binary (BAM), rather than text (SAM) format.
+.TP
+\-B code
+Replace the barcode stripped during conversion to SAM/BAM. Multiplexed Illumina reads normally contain a barcode to differentiate the sets. These are not present in SAM/BAM files (though are often in the file name). This option allows them to reappear in the names of the sequences output.
 .TP
 \-f file.sam
 The location of the reads in SAM or BAM format. Use \fB-\fR to read from standard input.

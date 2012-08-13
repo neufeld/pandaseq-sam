@@ -151,6 +151,7 @@ int main(int argc, char **argv)
 	double q = 0.36;
 	int qualmin = 33;
 	size_t roffset = 1;
+	char *tag = NULL;
 	double threshold;
 	bool version = false;
 #ifdef HAVE_PTHREAD
@@ -167,7 +168,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Process command line arguments. */
-	while ((c = getopt(argc, argv, "hvbp:q:f:t:o:Nl:L:Q:C:6Fd:"
+	while ((c = getopt(argc, argv, "hvbB:p:q:f:t:o:Nl:L:Q:C:6Fd:"
 #ifdef HAVE_PTHREAD
 			   "T:"
 #endif
@@ -182,6 +183,9 @@ int main(int argc, char **argv)
 			break;
 		case 'b':
 			binary = true;
+			break;
+		case 'B':
+			tag = optarg;
 			break;
 		case 't':
 			errno = 0;
@@ -350,7 +354,8 @@ int main(int argc, char **argv)
 			    || optopt == (int)'p' || optopt == (int)'q'
 			    || optopt == (int)'l' || optopt == (int)'L'
 			    || optopt == (int)'Q' || optopt == (int)'C'
-					|| optopt == (int)'T' || optopt == (int)'d') {
+					|| optopt == (int)'T' || optopt == (int)'d'
+					|| optopt == (int)'B') {
 				fprintf(stderr,
 					"Option -%c requires an argument.\n",
 					optopt);
@@ -401,6 +406,7 @@ int main(int argc, char **argv)
 			"\n"
 			"\t-6\tUse PHRED+64 (CASAVA 1.3-1.7) instead of PHRED+33 (CASAVA 1.8+).\n"
 			"\t-b\tRead a binary (BAM) file rather than a text (SAM) file.\n"
+			"\t-B code\tReplace the Illumina multiplexing barcode stripped during processing into SAM/BAM.\n"
 			"\t-C module\tLoad a sequence validation module.\n"
 			"\t-d flags\tControl the logging messages. Capital to enable; small to disable.\n"
 				"\t\t(R)econstruction detail.\n"
@@ -453,7 +459,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_PTHREAD
 	mux = panda_mux_open_sam(filename,
 				      (PandaLogger)panda_logger_file, stderr,
-				      NULL, binary,
+				      NULL, binary, tag,
 				      qualmin);
 	if (mux == NULL) {
 		fprintf(stderr, "ERR\tLIB\tCould not create multiplexer.\n");
@@ -467,7 +473,7 @@ int main(int argc, char **argv)
 #else
 	assembler = panda_assembler_open_sam(filename,
 					    (PandaLogger)panda_logger_file,
-					    stderr, NULL, binary,
+					    stderr, NULL, binary, tag,
 					    qualmin);
 #endif
 	if (assembler == NULL) {

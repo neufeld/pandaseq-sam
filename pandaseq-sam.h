@@ -39,6 +39,7 @@ bool panda_seqid_parse_sam(panda_seq_identifier *id, char *str);
  * @param logger, logger_data the logging function to use during assembly. The logging function will not be memory managed.
  * @param binary whether the file is binary (BAM) or text (SAM)
  * @param qualmin the value to strip from the quality scores. Usually 33 or 64, depending on CASAVA version.
+ * @param tag a tag to replace the missing Illumina barcoding tag
  * @param user_data where to store the user_data for this function
  * @param destroy where to store the destroy function for the user data
  */
@@ -46,6 +47,7 @@ PandaNextSeq panda_create_sam_reader(/*@notnull@ */ char *filename,
 				       /*@notnull@ */ PandaLogger logger,
 				       /*@null@ */ void *logger_data,
 				       bool binary,
+				       /*@null@ */ char *tag,
 				       unsigned char qualmin,
 				       /*@notnull@@out@ */ void **user_data,
 				       /*@notnull@@out@ */
@@ -59,6 +61,7 @@ PandaAssembler panda_assembler_open_sam( /*@notnull@ */ char *filename,
 								     /*@null@ */ void *logger_data,
 								     /*@null@ */ PandaDestroy logger_destroy,
 								     bool binary,
+				             /*@null@ */ char *tag,
 								     unsigned char qualmin);
 /**
  * Create a new multiplexed reader for given a SAM file.
@@ -69,5 +72,6 @@ PandaMux panda_mux_open_sam( /*@notnull@ */ char *filename,
 						  /*@null@ */ void *logger_data,
 						  /*@null@ */ PandaDestroy logger_destroy,
 						  bool binary,
+				       /*@null@ */ char *tag,
 						  unsigned char qualmin);
 #endif
