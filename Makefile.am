@@ -15,13 +15,20 @@ pandaseq_sam_CPPFLAGS = $(PANDASEQ_CFLAGS) -std=gnu99 -pedantic -g
 pandaseq_sam_LDFLAGS = $(PANDASEQ_LIBS) libpandaseq-sam.la
 pandaseq_sam_SOURCES = main.c
 libpandaseq_sam_la_CPPFLAGS = \
-	$(PTHREAD_CFLAGS) \
+	$(LIB_LIBS) \
 	$(PANDASEQ_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	-g \
 	-Isamtools \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_USE_KNETFILE \
 	$(NULL)
-libpandaseq_sam_la_LDFLAGS = $(PANDASEQ_LIBS) $(PTHREAD_LIBS) -export-symbols-regex '^panda_'
+libpandaseq_sam_la_CFLAGS = $(LIB_CFLAGS)
+libpandaseq_sam_la_LDFLAGS = \
+	$(LIB_CPPFLAGS) \
+	$(PANDASEQ_LIBS) \
+	$(PTHREAD_LIBS) \
+	-export-symbols-regex '^panda_' \
+	$(NULL)
 libpandaseq_sam_la_SOURCES = \
 	reader.c \
 	seqid.c \
