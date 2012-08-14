@@ -11,7 +11,9 @@ A working version of PANDAseq must first be installed, including the development
 First, download the samtools source:
 	git submodule init && git submodule update
 
-After PANDAseq is installed, one should be able to do:
+You should now have a `samtools' subdirectory populated with files including `sam.h' and `khash.h'. If this doesn't occur, or you are working from non-git sources, you can download this separately and place it in that directory.
+
+After the samtools sources are present, one should be able to do:
 	./autogen.sh && ./configure && make && sudo make install
 
 If you receive an error that libpandaseq-sam.so.0 is not found, try running:
