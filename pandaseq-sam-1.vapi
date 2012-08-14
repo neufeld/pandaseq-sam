@@ -24,20 +24,19 @@ namespace Panda.SAM {
 	 * @param logger the logging function to use during assembly.
 	 * @param binary whether the file is binary (BAM) or text (SAM)
 	 * @param tag a tag to replace the missing Illumina barcoding tag
-	 * @param qualmin the value to strip from the quality scores. Usually 33 or 64, depending on CASAVA version.
 	 */
 	[CCode(cname = "panda_create_sam_reader")]
-	public NextSeq? create_reader(string filename, Logger logger, bool binary, string? tag = null, uint8 qualmin = 33);
+	public NextSeq? create_reader(string filename, Logger logger, bool binary, string? tag = null);
 	/**
 	 * Create a new assembler for given a SAM file.
 	 * @see create_reader
 	 */
 	[CCode(cname = "panda_assembler_open_sam")]
-	public Assembler? open(string filename, owned Logger logger, bool binary, string? tag = null, uint8 qualmin = 33);
+	public Assembler? open(string filename, owned Logger logger, bool binary, string? tag = null);
 	/**
 	 * Create a new multiplexed reader for given a SAM file.
 	 * @see create_reader
 	 */
 	[CCode(cname = "panda_mux_open_sam")]
-	public Mux? open_mux(string filename, owned Logger logger, bool binary, string? tag = null, uint8 qualmin = 33);
+	public Mux? open_mux(string filename, owned Logger logger, bool binary, string? tag = null);
 }

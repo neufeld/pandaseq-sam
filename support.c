@@ -28,11 +28,11 @@ const char *panda_sam_version(void) {
 	return BAM_VERSION;
 }
 
-PandaAssembler panda_assembler_open_sam(char *filename, PandaLogger logger, void *logger_data, PandaDestroy logger_destroy, bool binary, char *tag, unsigned char qualmin){
+PandaAssembler panda_assembler_open_sam(char *filename, PandaLogger logger, void *logger_data, PandaDestroy logger_destroy, bool binary, char *tag){
 	void *next_data;
 	PandaDestroy next_destroy;
 	PandaNextSeq next;
-	next = panda_create_sam_reader(filename, logger, logger_data, binary, tag, qualmin, &next_data, &next_destroy);
+	next = panda_create_sam_reader(filename, logger, logger_data, binary, tag, &next_data, &next_destroy);
 	if (next == NULL) {
 		return NULL;
 	}
@@ -40,11 +40,11 @@ PandaAssembler panda_assembler_open_sam(char *filename, PandaLogger logger, void
 }
 
 #ifdef HAVE_PTHREAD
-PandaMux panda_mux_open_sam(char *filename, PandaLogger logger, void *logger_data, PandaDestroy logger_destroy, bool binary, char *tag, unsigned char qualmin) {
+PandaMux panda_mux_open_sam(char *filename, PandaLogger logger, void *logger_data, PandaDestroy logger_destroy, bool binary, char *tag) {
 	void *next_data;
 	PandaDestroy next_destroy;
 	PandaNextSeq next;
-	next = panda_create_sam_reader(filename, logger, logger_data, binary, tag, qualmin, &next_data, &next_destroy);
+	next = panda_create_sam_reader(filename, logger, logger_data, binary, tag, &next_data, &next_destroy);
 	if (next == NULL) {
 		return NULL;
 	}

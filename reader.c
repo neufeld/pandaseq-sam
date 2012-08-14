@@ -28,7 +28,6 @@ struct reader_data {
 	khash_t(seq) *pool;
 	PandaLogger logger;
 	void *logger_data;
-	unsigned char qualmin;
 	size_t forward_length;
 	size_t reverse_length;
 	panda_qual forward[PANDA_MAX_LEN];
@@ -92,13 +91,13 @@ bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_len
 			data->forward_length = bam_forward->core.l_qseq;
 			for(it = 0; it < data->forward_length; it++) {
 				data->forward[it].nt = (panda_nt)(bam1_seqi(bam1_seq(bam_forward), it));
-				data->forward[it].qual = bam1_qual(bam_forward)[it] - data->qualmin;
+				data->forward[it].qual = bam1_qual(bam_forward)[it];
 			}
 
 			data->reverse_length = bam_reverse->core.l_qseq;
 			for(it = 0; it < data->reverse_length; it++) {
 				data->reverse[it].nt = (panda_nt)bam1_seqi(bam1_seq(bam_reverse), it);
-				data->reverse[it].qual = bam1_qual(bam_reverse)[it] - data->qualmin;
+				data->reverse[it].qual = bam1_qual(bam_reverse)[it];
 			}
 			bam_destroy1(seq);
 			bam_destroy1(mate);
@@ -132,7 +131,7 @@ void ps_destroy(struct reader_data *data) {
 	free(data);
 }
 
-PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *logger_data, bool binary, char *tag, unsigned char qualmin, void **user_data, PandaDestroy *destroy) {
+PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *logger_data, bool binary, char *tag, void **user_data, PandaDestroy *destroy) {
 	struct reader_data *data;
 
 	*destroy = NULL;
@@ -148,9 +147,7 @@ PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *l
 		free(data);
 		return NULL;
 	}
-	data->qualmin = qualmin;
 	data->pool = kh_init(seq);
-	data->qualmin = qualmin;
 	if (tag == NULL) {
 		data->tag_length = 0;
 		data->tag[0] = '\0';

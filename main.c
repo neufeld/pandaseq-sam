@@ -147,7 +147,6 @@ int main(int argc, char **argv)
 	PandaModule modules[MAX_MODULES];
 	bool okay;
 	double q = 0.36;
-	int qualmin = 33;
 	size_t roffset = 1;
 	char *tag = NULL;
 	double threshold;
@@ -161,7 +160,7 @@ int main(int argc, char **argv)
 	threshold = 0.6;
 
 	/* Process command line arguments. */
-	while ((c = getopt(argc, argv, "hvbB:p:q:f:t:o:Nl:L:Q:C:6Fd:"
+	while ((c = getopt(argc, argv, "hvbB:p:q:f:t:o:Nl:L:Q:C:Fd:"
 #ifdef HAVE_PTHREAD
 			   "T:"
 #endif
@@ -284,9 +283,6 @@ int main(int argc, char **argv)
 				return 1;
 			}
 			modules_length++;
-			break;
-		case '6':
-			qualmin = 64;
 			break;
 #ifdef HAVE_PTHREAD
 		case 'T':
@@ -439,8 +435,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_PTHREAD
 	mux = panda_mux_open_sam(filename,
 				      (PandaLogger)panda_logger_file, stderr,
-				      NULL, binary, tag,
-				      qualmin);
+				      NULL, binary, tag);
 	if (mux == NULL) {
 		fprintf(stderr, "ERR\tLIB\tCould not create multiplexer.\n");
 		for (it = 0; it < modules_length; it++)
@@ -452,8 +447,7 @@ int main(int argc, char **argv)
 #else
 	assembler = panda_assembler_open_sam(filename,
 					    (PandaLogger)panda_logger_file,
-					    stderr, NULL, binary, tag,
-					    qualmin);
+					    stderr, NULL, binary, tag);
 #endif
 	if (assembler == NULL) {
 		fprintf(stderr, "ERR\tLIB\tCould not create assembler.\n");
