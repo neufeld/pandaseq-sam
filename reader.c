@@ -42,6 +42,11 @@ bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_len
 	int res;
 	khiter_t key;
 	bam1_t *seq = bam_init1();
+
+	*forward = NULL;
+	*forward_length = 0;
+	*reverse = NULL;
+	*reverse_length = 0;
 	while ((res = samread(data->file, seq)) > 0) {
 		if (seq->core.l_qseq < 1 || seq->core.l_qseq > PANDA_MAX_LEN || !(seq->core.flag & BAM_FPAIRED)) {
 			continue;
@@ -97,6 +102,10 @@ bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_len
 			}
 			bam_destroy1(seq);
 			bam_destroy1(mate);
+			*forward = data->forward;
+			*forward_length = data->forward_length;
+			*reverse = data->reverse;
+			*reverse_length = data->reverse_length;
 			return true;
 		}
 	}
