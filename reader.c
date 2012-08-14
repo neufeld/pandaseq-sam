@@ -112,7 +112,11 @@ void ps_destroy(struct reader_data *data) {
 	samclose(data->file);
 	for (key = kh_begin(data->pool); key != kh_end(data->pool); key++) {
 		if (kh_exist(data->pool, key)) {
-			bam_destroy1(kh_value(data->pool, key));
+			bam1_t *seq = kh_value(data->pool, key);
+			if (data->logger != NULL && panda_debug_flags & PANDA_DEBUG_FILE) {
+				data->logger(PANDA_CODE_PARSE_FAILURE, NULL, bam1_qname(seq), data->logger_data);
+			}
+			bam_destroy1(seq);
 		}
 	}
 	kh_destroy(seq, data->pool);
