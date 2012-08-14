@@ -152,6 +152,7 @@ PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *l
 	data->pool = kh_init(seq);
 	data->qualmin = qualmin;
 	if (tag == NULL) {
+		data->tag_length = 0;
 		data->tag[0] = '\0';
 	} else {
 		data->tag_length = strlen(tag);
