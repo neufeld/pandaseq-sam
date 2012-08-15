@@ -11,6 +11,11 @@ PLAIN_CPPFLAGS="$CPPFLAGS"
 PLAIN_CFLAGS="$CFLAGS"
 PLAIN_LIBS="$LIBS"
 
+AC_CHECK_TYPES([bam1_t, khiter_t], [], [AC_MSG_ERROR([*** samtools is required, install the samtools sources in this directory. See the README for details])], [[
+		#include "samtools/sam.h"
+		#include "samtools/khash.h"
+	]])
+
 ACX_PTHREAD
 AC_CHECK_HEADERS([math.h])
 AC_CHECK_LIB([m],[pow])
