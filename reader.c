@@ -36,8 +36,17 @@ struct reader_data {
 	size_t tag_length;
 };
 
-bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_length, panda_qual **reverse, size_t *reverse_length, struct reader_data *data) {
+void ps_fill(bam1_t *bam, panda_qual *seq, size_t *seq_length) {
 	size_t it;
+	*seq_length = bam->core.l_qseq;
+	for(it = 0; it < *seq_length; it++) {
+		size_t pos = (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
+		seq[pos].nt = (panda_nt)(bam1_seqi(bam1_seq(bam), it));
+		seq[pos].qual = bam1_qual(bam)[it];
+	}
+}
+
+bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_length, panda_qual **reverse, size_t *reverse_length, struct reader_data *data) {
 	int res;
 	khiter_t key;
 	bam1_t *seq = bam_init1();
@@ -65,8 +74,6 @@ bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_len
 			kh_value(data->pool, key) = seq;
 			seq = bam_init1();
 		} else {
-			bam1_t *bam_forward;
-			bam1_t *bam_reverse;
 			bam1_t *mate = kh_value(data->pool, key);
 			kh_del(seq, data->pool, key);
 
@@ -81,24 +88,13 @@ bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_len
 			memcpy(id->tag, data->tag, data->tag_length + 1);
 
 			if (seq->core.flag & BAM_FREAD1) {
-				bam_forward = seq;
-				bam_reverse = mate;
+				ps_fill(seq, data->forward, &data->forward_length);
+				ps_fill(mate, data->reverse, &data->reverse_length);
 			} else {
-				bam_forward = mate;
-				bam_reverse = seq;
+				ps_fill(mate, data->forward, &data->forward_length);
+				ps_fill(seq, data->reverse, &data->reverse_length);
 			}
 
-			data->forward_length = bam_forward->core.l_qseq;
-			for(it = 0; it < data->forward_length; it++) {
-				data->forward[it].nt = (panda_nt)(bam1_seqi(bam1_seq(bam_forward), it));
-				data->forward[it].qual = bam1_qual(bam_forward)[it];
-			}
-
-			data->reverse_length = bam_reverse->core.l_qseq;
-			for(it = 0; it < data->reverse_length; it++) {
-				data->reverse[it].nt = (panda_nt)bam1_seqi(bam1_seq(bam_reverse), it);
-				data->reverse[it].qual = bam1_qual(bam_reverse)[it];
-			}
 			bam_destroy1(seq);
 			bam_destroy1(mate);
 			*forward = data->forward;
