@@ -1,7 +1,7 @@
 Source: pandaseq-sam
 Section: science
 Maintainer: Andre Masella <andre@masella.name>
-Build-Depends: debhelper (>= 7.0.50~), autotools-dev, zlib1g-dev, pandaseq-dev (>= 2.1~), libtool
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, zlib1g-dev, pandaseq-dev (>= 2.2~), libtool
 Priority: extra
 Standards-Version: 3.9.1
 Homepage: http://github.com/neufeld/pandaseq-sam
