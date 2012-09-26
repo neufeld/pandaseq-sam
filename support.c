@@ -20,15 +20,24 @@
 
 #include "pandaseq-sam.h"
 #ifdef HAVE_PTHREAD
-#include <pthread.h>
+#        include <pthread.h>
 #endif
 #include <sam.h>
 
-const char *panda_sam_version(void) {
+const char *
+panda_sam_version(
+	void) {
 	return BAM_VERSION;
 }
 
-PandaAssembler panda_assembler_open_sam(char *filename, PandaLogger logger, void *logger_data, PandaDestroy logger_destroy, bool binary, char *tag){
+PandaAssembler
+panda_assembler_open_sam(
+	char *filename,
+	PandaLogger logger,
+	void *logger_data,
+	PandaDestroy logger_destroy,
+	bool binary,
+	char *tag) {
 	void *next_data;
 	PandaDestroy next_destroy;
 	PandaNextSeq next;
@@ -40,7 +49,14 @@ PandaAssembler panda_assembler_open_sam(char *filename, PandaLogger logger, void
 }
 
 #ifdef HAVE_PTHREAD
-PandaMux panda_mux_open_sam(char *filename, PandaLogger logger, void *logger_data, PandaDestroy logger_destroy, bool binary, char *tag) {
+PandaMux
+panda_mux_open_sam(
+	char *filename,
+	PandaLogger logger,
+	void *logger_data,
+	PandaDestroy logger_destroy,
+	bool binary,
+	char *tag) {
 	void *next_data;
 	PandaDestroy next_destroy;
 	PandaNextSeq next;

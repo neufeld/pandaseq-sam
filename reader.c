@@ -21,11 +21,12 @@
 #include "pandaseq-sam.h"
 #include <khash.h>
 #include <sam.h>
-KHASH_MAP_INIT_STR(seq, bam1_t*)
+KHASH_MAP_INIT_STR(seq, bam1_t *)
 
 struct reader_data {
 	samfile_t *file;
-	khash_t(seq) *pool;
+	 khash_t(
+		seq) * pool;
 	PandaLogger logger;
 	void *logger_data;
 	size_t forward_length;
@@ -36,17 +37,28 @@ struct reader_data {
 	size_t tag_length;
 };
 
-void ps_fill(bam1_t *bam, panda_qual *seq, size_t *seq_length) {
+void
+ps_fill(
+	bam1_t *bam,
+	panda_qual *seq,
+	size_t *seq_length) {
 	size_t it;
 	*seq_length = bam->core.l_qseq;
-	for(it = 0; it < *seq_length; it++) {
+	for (it = 0; it < *seq_length; it++) {
 		size_t pos = (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
-		seq[pos].nt = (panda_nt)(bam1_seqi(bam1_seq(bam), it));
+		seq[pos].nt = (panda_nt) (bam1_seqi(bam1_seq(bam), it));
 		seq[pos].qual = bam1_qual(bam)[it];
 	}
 }
 
-bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_length, panda_qual **reverse, size_t *reverse_length, struct reader_data *data) {
+bool
+ps_next(
+	panda_seq_identifier *id,
+	panda_qual **forward,
+	size_t *forward_length,
+	panda_qual **reverse,
+	size_t *reverse_length,
+	struct reader_data *data) {
 	int res;
 	khiter_t key;
 	bam1_t *seq = bam_init1();
@@ -111,7 +123,9 @@ bool ps_next(panda_seq_identifier *id, panda_qual **forward, size_t *forward_len
 	return false;
 }
 
-void ps_destroy(struct reader_data *data) {
+void
+ps_destroy(
+	struct reader_data *data) {
 	khiter_t key;
 	samclose(data->file);
 	for (key = kh_begin(data->pool); key != kh_end(data->pool); key++) {
@@ -127,7 +141,15 @@ void ps_destroy(struct reader_data *data) {
 	free(data);
 }
 
-PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *logger_data, bool binary, char *tag, void **user_data, PandaDestroy *destroy) {
+PandaNextSeq
+panda_create_sam_reader(
+	char *filename,
+	PandaLogger logger,
+	void *logger_data,
+	bool binary,
+	char *tag,
+	void **user_data,
+	PandaDestroy *destroy) {
 	struct reader_data *data;
 
 	*destroy = NULL;
@@ -155,7 +177,7 @@ PandaNextSeq panda_create_sam_reader(char *filename, PandaLogger logger, void *l
 		memcpy(data->tag, tag, data->tag_length);
 		data->tag[data->tag_length] = '\0';
 	}
-	*destroy = (PandaDestroy)ps_destroy;
+	*destroy = (PandaDestroy) ps_destroy;
 	*user_data = data;
 	return (PandaNextSeq) ps_next;
 }

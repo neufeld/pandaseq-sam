@@ -17,20 +17,23 @@
  */
 
 #ifndef _PANDASEQ_SAM_H
-#define _PANDASEQ_SAM_H
-#include <pandaseq.h>
+#        define _PANDASEQ_SAM_H
+#        include <pandaseq.h>
 
 /**
  * Get the version of the underlying SAM tools library used.
  */
-const char *panda_sam_version(void);
+const char *panda_sam_version(
+	void);
 
 /**
  * Parse a SAM/BAM style Illumina sequence.
  *
  * These are different from normal Illumina names as the tags have been stripped.
  */
-bool panda_seqid_parse_sam(panda_seq_identifier *id, char *str);
+bool panda_seqid_parse_sam(
+	panda_seq_identifier *id,
+	char *str);
 
 /**
  * Create an object to read sequences from a SAM file
@@ -42,32 +45,34 @@ bool panda_seqid_parse_sam(panda_seq_identifier *id, char *str);
  * @param user_data where to store the user_data for this function
  * @param destroy where to store the destroy function for the user data
  */
-PandaNextSeq panda_create_sam_reader(/*@notnull@ */ char *filename,
-				       /*@notnull@ */ PandaLogger logger,
-				       /*@null@ */ void *logger_data,
-				       bool binary,
-				       /*@null@ */ char *tag,
-				       /*@notnull@@out@ */ void **user_data,
-				       /*@notnull@@out@ */
-				       PandaDestroy * destroy);
+PandaNextSeq panda_create_sam_reader(
+	/*@notnull@ */ char *filename,
+	/*@notnull@ */ PandaLogger logger,
+	/*@null@ */ void *logger_data,
+	bool binary,
+	/*@null@ */ char *tag,
+	/*@notnull@@out@ */ void **user_data,
+	/*@notnull@@out@ */ PandaDestroy *destroy);
 /**
  * Create a new assembler for given a SAM file.
  * @see panda_create_sam_reader
  */
-PandaAssembler panda_assembler_open_sam( /*@notnull@ */ char *filename,
-								     /*@notnull@ */ PandaLogger logger,
-								     /*@null@ */ void *logger_data,
-								     /*@null@ */ PandaDestroy logger_destroy,
-								     bool binary,
-				             /*@null@ */ char *tag);
+PandaAssembler panda_assembler_open_sam(
+	/*@notnull@ */ char *filename,
+	/*@notnull@ */ PandaLogger logger,
+	/*@null@ */ void *logger_data,
+	/*@null@ */ PandaDestroy logger_destroy,
+	bool binary,
+	/*@null@ */ char *tag);
 /**
  * Create a new multiplexed reader for given a SAM file.
  * @see panda_create_sam_reader
  */
-PandaMux panda_mux_open_sam( /*@notnull@ */ char *filename,
-						  /*@notnull@ */ PandaLogger logger,
-						  /*@null@ */ void *logger_data,
-						  /*@null@ */ PandaDestroy logger_destroy,
-						  bool binary,
-				       /*@null@ */ char *tag);
+PandaMux panda_mux_open_sam(
+	/*@notnull@ */ char *filename,
+	/*@notnull@ */ PandaLogger logger,
+	/*@null@ */ void *logger_data,
+	/*@null@ */ PandaDestroy logger_destroy,
+	bool binary,
+	/*@null@ */ char *tag);
 #endif
