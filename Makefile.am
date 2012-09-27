@@ -28,6 +28,7 @@ libpandaseq_sam_la_LDFLAGS = \
 	$(PANDASEQ_LIBS) \
 	$(PTHREAD_LIBS) \
 	-export-symbols-regex '^panda_' \
+ 	-version-info $(LIB_VER) \
 	$(NULL)
 libpandaseq_sam_la_SOURCES = \
 	reader.c \
