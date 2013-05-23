@@ -21,22 +21,60 @@ namespace Panda.SAM {
 	 * Create an object to read sequences from a SAM file
 	 *
 	 * @param filename the filename containing paired-end Illumina sequences
-	 * @param logger the logging function to use during assembly.
+	 * @param logger the logging to use during assembly.
 	 * @param binary whether the file is binary (BAM) or text (SAM)
 	 * @param tag a tag to replace the missing Illumina barcoding tag
 	 */
 	[CCode(cname = "panda_create_sam_reader")]
-	public NextSeq? create_reader(string filename, Logger logger, bool binary, string? tag = null);
+	public NextSeq? create_reader(string filename, LogProxy logger, bool binary, string? tag = null);
 	/**
 	 * Create a new assembler for given a SAM file.
 	 * @see create_reader
 	 */
 	[CCode(cname = "panda_assembler_open_sam")]
-	public Assembler? open(string filename, owned Logger logger, bool binary, string? tag = null);
+	public Assembler? open(string filename, LogProxy logger, bool binary, string? tag = null);
 	/**
 	 * Create a new multiplexed reader for given a SAM file.
 	 * @see create_reader
 	 */
 	[CCode(cname = "panda_mux_open_sam")]
-	public Mux? open_mux(string filename, owned Logger logger, bool binary, string? tag = null);
+	public Mux? open_mux(string filename, LogProxy logger, bool binary, string? tag = null);
+
+	/**
+	 * The standard argument handler for a SAM file of pair-end reads.
+	 */
+	[CCode(cname = "struct panda_args_sam", free_function = "panda_args_sam_free")]
+	[Compact]
+	public class Args {
+
+		/**
+		 * Command line arguments for a SAM file of pair-end reads.
+		 */
+		[CCode(cname = "panda_args_sam_args", array_length_cexpr = "panda_args_sam_args_length", array_length_type = "size_t")]
+		extern const Tweak.general?[] args;
+
+		/**
+		 * Create a new argument handler.
+		 */
+		[CCode(cname = "panda_args_sam_new")]
+		public Args();
+
+		/**
+		 * Process the command line arguments for the SAM argument handler.
+		 */
+		[CCode(cname = "panda_args_sam_tweak")]
+		public bool tweak(char flag, string argument);
+
+		/**
+		 * Initialise the sequence stream for the SAM argument handler.
+		 */
+		[CCode(cname = "panda_args_sam_opener")]
+		public NextSeq opener(LogProxy logger, out FailAlign? fail);
+
+		/**
+		 * Do additional assembly setup for the SAM argument handler.
+		 */
+		[CCode(cname = "panda_args_sam_setup")]
+		public bool setup(Assembler assembler);
+	}
 }

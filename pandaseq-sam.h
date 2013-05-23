@@ -19,7 +19,14 @@
 #ifndef _PANDASEQ_SAM_H
 #        define _PANDASEQ_SAM_H
 #        include <pandaseq.h>
-
+#        ifdef __cplusplus
+#                define EXTERN_C_BEGIN  extern "C" {
+#                define EXTERN_C_END    }
+#        else
+#                define EXTERN_C_BEGIN
+#                define EXTERN_C_END
+#        endif
+EXTERN_C_BEGIN
 /**
  * Get the version of the underlying SAM tools library used.
  */
@@ -38,41 +45,86 @@ bool panda_seqid_parse_sam(
 /**
  * Create an object to read sequences from a SAM file
  *
- * @param filename the filename containing paired-end Illumina sequences
- * @param logger, logger_data the logging function to use during assembly. The logging function will not be memory managed.
- * @param binary whether the file is binary (BAM) or text (SAM)
- * @param tag a tag to replace the missing Illumina barcoding tag
- * @param user_data where to store the user_data for this function
- * @param destroy where to store the destroy function for the user data
+ * @filename: the filename containing paired-end Illumina sequences
+ * @logger: the logging to use during assembly
+ * @binary: whether the file is binary (BAM) or text (SAM)
+ * @tag:(allow-none): a tag to replace the missing Illumina barcoding tag
+ * Returns:(closure user_data) (scope notified): a sequence source callback
  */
 PandaNextSeq panda_create_sam_reader(
-	/*@notnull@ */ char *filename,
-	/*@notnull@ */ PandaLogger logger,
-	/*@null@ */ void *logger_data,
+	const char *filename,
+	PandaLogProxy logger,
 	bool binary,
-	/*@null@ */ char *tag,
-	/*@notnull@@out@ */ void **user_data,
-	/*@notnull@@out@ */ PandaDestroy *destroy);
+	const char *tag,
+	void **user_data,
+	PandaDestroy *destroy);
 /**
  * Create a new assembler for given a SAM file.
  * @see panda_create_sam_reader
  */
 PandaAssembler panda_assembler_open_sam(
-	/*@notnull@ */ char *filename,
-	/*@notnull@ */ PandaLogger logger,
-	/*@null@ */ void *logger_data,
-	/*@null@ */ PandaDestroy logger_destroy,
+	const char *filename,
+	PandaLogProxy logger,
 	bool binary,
-	/*@null@ */ char *tag);
+	const char *tag);
 /**
  * Create a new multiplexed reader for given a SAM file.
  * @see panda_create_sam_reader
  */
 PandaMux panda_mux_open_sam(
-	/*@notnull@ */ char *filename,
-	/*@notnull@ */ PandaLogger logger,
-	/*@null@ */ void *logger_data,
-	/*@null@ */ PandaDestroy logger_destroy,
+	const char *filename,
+	PandaLogProxy logger,
 	bool binary,
-	/*@null@ */ char *tag);
+	const char *tag);
+/**
+ * The standard argument handler for a SAM file of pair-end reads.
+ */
+typedef struct panda_args_sam *PandaArgsSam;
+
+/**
+ * Command line arguments for a SAM file of pair-end reads.
+ */
+extern const panda_tweak_general *const panda_args_sam_args[];
+extern const size_t panda_args_sam_args_length;
+
+/**
+ * Create a new argument handler.
+ */
+PandaArgsSam panda_args_sam_new(
+	);
+
+/**
+ * Cleanup the argument handler.
+ */
+void panda_args_sam_free(
+	PandaArgsSam data);
+
+/**
+ * Process the command line arguments for the SAM argument handler.
+ */
+bool panda_args_sam_tweak(
+	PandaArgsSam data,
+	char flag,
+	const char *argument);
+
+/**
+ * Initialise the sequence stream for the SAM argument handler.
+ */
+PandaNextSeq panda_args_sam_opener(
+	PandaArgsSam data,
+	PandaLogProxy logger,
+	PandaFailAlign *fail,
+	void **fail_data,
+	PandaDestroy *fail_destroy,
+	void **next_data,
+	PandaDestroy *next_destroy);
+
+/**
+ * Do additional assembly setup for the SAM argument handler.
+ */
+bool panda_args_sam_setup(
+	PandaArgsSam data,
+	PandaAssembler assembler);
+
+EXTERN_C_END
 #endif

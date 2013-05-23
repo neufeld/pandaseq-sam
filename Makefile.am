@@ -31,6 +31,7 @@ libpandaseq_sam_la_LDFLAGS = \
  	-version-info $(LIB_VER) \
 	$(NULL)
 libpandaseq_sam_la_SOURCES = \
+	args.c \
 	reader.c \
 	seqid.c \
 	support.c \

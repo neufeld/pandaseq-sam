@@ -24,8 +24,7 @@
 #define PARSE_CHUNK if (*input == '\0') return 0; for(;*input != '\0' && *input != ':' && *input != ' '; input++)
 #define PARSE_INT do { value = 0; PARSE_CHUNK { if (*input >= '0' && *input <= '9') { value = 10*value + (*input - '0'); } else { return 0; } } } while(0)
 
-bool
-panda_seqid_parse_sam(
+bool panda_seqid_parse_sam(
 	panda_seq_identifier *id,
 	char *input) {
 	char *dest;

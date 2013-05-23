@@ -21,24 +21,23 @@
 #include "pandaseq-sam.h"
 #include <khash.h>
 #include <sam.h>
-KHASH_MAP_INIT_STR(seq, bam1_t *)
+
+KHASH_MAP_INIT_STR(seq, bam1_t *);
 
 struct reader_data {
 	samfile_t *file;
 	 khash_t(
 		seq) * pool;
-	PandaLogger logger;
-	void *logger_data;
+	PandaLogProxy logger;
+	panda_qual *forward;
 	size_t forward_length;
+	panda_qual *reverse;
 	size_t reverse_length;
-	panda_qual forward[PANDA_MAX_LEN];
-	panda_qual reverse[PANDA_MAX_LEN];
-	char tag[PANDA_TAG_LEN];
 	size_t tag_length;
+	char tag[PANDA_TAG_LEN];
 };
 
-void
-ps_fill(
+void ps_fill(
 	bam1_t *bam,
 	panda_qual *seq,
 	size_t *seq_length) {
@@ -51,8 +50,7 @@ ps_fill(
 	}
 }
 
-bool
-ps_next(
+bool ps_next(
 	panda_seq_identifier *id,
 	panda_qual **forward,
 	size_t *forward_length,
@@ -77,8 +75,8 @@ ps_next(
 			khiter_t key;
 			key = kh_put(seq, data->pool, bam1_qname(seq), &ret);
 			if (ret == 0) {
-				if (data->logger != NULL && panda_debug_flags & PANDA_DEBUG_FILE) {
-					data->logger(PANDA_CODE_PREMATURE_EOF, NULL, bam1_qname(seq), data->logger_data);
+				if (panda_debug_flags & PANDA_DEBUG_FILE) {
+					panda_log_proxy_write(data->logger, PANDA_CODE_PREMATURE_EOF, NULL, bam1_qname(seq));
 				}
 				bam_destroy1(seq);
 				return false;
@@ -92,8 +90,8 @@ ps_next(
 			if (!panda_seqid_parse_sam(id, bam1_qname(seq))) {
 				bam_destroy1(mate);
 				bam_destroy1(seq);
-				if (data->logger != NULL && panda_debug_flags & PANDA_DEBUG_FILE) {
-					data->logger(PANDA_CODE_ID_PARSE_FAILURE, NULL, bam1_qname(seq), data->logger_data);
+				if (panda_debug_flags & PANDA_DEBUG_FILE) {
+					panda_log_proxy_write(data->logger, PANDA_CODE_ID_PARSE_FAILURE, NULL, bam1_qname(seq));
 				}
 				return false;
 			}
@@ -116,38 +114,38 @@ ps_next(
 			return true;
 		}
 	}
-	if (res == -2 && data->logger != NULL && panda_debug_flags & PANDA_DEBUG_FILE) {
-		data->logger(PANDA_CODE_PREMATURE_EOF, NULL, bam1_qname(seq), data->logger_data);
+	if (res == -2 && panda_debug_flags & PANDA_DEBUG_FILE) {
+		panda_log_proxy_write(data->logger, PANDA_CODE_PREMATURE_EOF, NULL, bam1_qname(seq));
 	}
 	bam_destroy1(seq);
 	return false;
 }
 
-void
-ps_destroy(
+void ps_destroy(
 	struct reader_data *data) {
 	khiter_t key;
 	samclose(data->file);
 	for (key = kh_begin(data->pool); key != kh_end(data->pool); key++) {
 		if (kh_exist(data->pool, key)) {
 			bam1_t *seq = kh_value(data->pool, key);
-			if (data->logger != NULL && panda_debug_flags & PANDA_DEBUG_FILE) {
-				data->logger(PANDA_CODE_PARSE_FAILURE, NULL, bam1_qname(seq), data->logger_data);
+			if (panda_debug_flags & PANDA_DEBUG_FILE) {
+				panda_log_proxy_write(data->logger, PANDA_CODE_PARSE_FAILURE, NULL, bam1_qname(seq));
 			}
 			bam_destroy1(seq);
 		}
 	}
 	kh_destroy(seq, data->pool);
+	panda_log_proxy_unref(data->logger);
+	free(data->forward);
+	free(data->reverse);
 	free(data);
 }
 
-PandaNextSeq
-panda_create_sam_reader(
-	char *filename,
-	PandaLogger logger,
-	void *logger_data,
+PandaNextSeq panda_create_sam_reader(
+	const char *filename,
+	PandaLogProxy logger,
 	bool binary,
-	char *tag,
+	const char *tag,
 	void **user_data,
 	PandaDestroy *destroy) {
 	struct reader_data *data;
@@ -159,9 +157,23 @@ panda_create_sam_reader(
 	if (data == NULL) {
 		return NULL;
 	}
+	data->forward = calloc(PANDA_MAX_LEN, sizeof(panda_qual));
+	if (data->forward == NULL) {
+		free(data);
+		return NULL;
+	}
+
+	data->reverse = calloc(PANDA_MAX_LEN, sizeof(panda_qual));
+	if (data->reverse == NULL) {
+		free(data->forward);
+		free(data);
+		return NULL;
+	}
 
 	data->file = samopen(filename, binary ? "rb" : "r", NULL);
 	if (data->file == NULL) {
+		free(data->forward);
+		free(data->reverse);
 		free(data);
 		return NULL;
 	}
@@ -177,6 +189,7 @@ panda_create_sam_reader(
 		memcpy(data->tag, tag, data->tag_length);
 		data->tag[data->tag_length] = '\0';
 	}
+	data->logger = panda_log_proxy_ref(logger);
 	*destroy = (PandaDestroy) ps_destroy;
 	*user_data = data;
 	return (PandaNextSeq) ps_next;
