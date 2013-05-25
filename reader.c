@@ -76,7 +76,7 @@ bool ps_next(
 			key = kh_put(seq, data->pool, bam1_qname(seq), &ret);
 			if (ret == 0) {
 				if (panda_debug_flags & PANDA_DEBUG_FILE) {
-					panda_log_proxy_write(data->logger, PANDA_CODE_PREMATURE_EOF, NULL, bam1_qname(seq));
+					panda_log_proxy_write(data->logger, PANDA_CODE_PREMATURE_EOF, NULL, NULL, bam1_qname(seq));
 				}
 				bam_destroy1(seq);
 				return false;
@@ -91,7 +91,7 @@ bool ps_next(
 				bam_destroy1(mate);
 				bam_destroy1(seq);
 				if (panda_debug_flags & PANDA_DEBUG_FILE) {
-					panda_log_proxy_write(data->logger, PANDA_CODE_ID_PARSE_FAILURE, NULL, bam1_qname(seq));
+					panda_log_proxy_write(data->logger, PANDA_CODE_ID_PARSE_FAILURE, NULL, NULL, bam1_qname(seq));
 				}
 				return false;
 			}
@@ -115,7 +115,7 @@ bool ps_next(
 		}
 	}
 	if (res == -2 && panda_debug_flags & PANDA_DEBUG_FILE) {
-		panda_log_proxy_write(data->logger, PANDA_CODE_PREMATURE_EOF, NULL, bam1_qname(seq));
+		panda_log_proxy_write(data->logger, PANDA_CODE_PREMATURE_EOF, NULL, NULL, bam1_qname(seq));
 	}
 	bam_destroy1(seq);
 	return false;
@@ -129,7 +129,7 @@ void ps_destroy(
 		if (kh_exist(data->pool, key)) {
 			bam1_t *seq = kh_value(data->pool, key);
 			if (panda_debug_flags & PANDA_DEBUG_FILE) {
-				panda_log_proxy_write(data->logger, PANDA_CODE_PARSE_FAILURE, NULL, bam1_qname(seq));
+				panda_log_proxy_write(data->logger, PANDA_CODE_PARSE_FAILURE, NULL, NULL, bam1_qname(seq));
 			}
 			bam_destroy1(seq);
 		}

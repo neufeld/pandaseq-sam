@@ -1,7 +1,7 @@
 Source: pandaseq-sam
 Section: science
 Maintainer: Andre Masella <andre@masella.name>
-Build-Depends: debhelper (>= 7.0.50~), autotools-dev, zlib1g-dev, pandaseq-dev (>= 2.2~), libtool
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, zlib1g-dev, pandaseq-dev (>= 2.5~), libtool
 Priority: extra
 Standards-Version: 3.9.1
 Homepage: http://github.com/neufeld/pandaseq-sam
@@ -20,7 +20,7 @@ Description: Pair-end read assembler
 
 Package: pandaseq-sam-dev
 Architecture: any
-Depends: ${misc:Depends}, libpandaseq-sam0 (= ${binary:Version}), pandaseq-dev, libtool
+Depends: ${misc:Depends}, libpandaseq-sam1 (= ${binary:Version}), pandaseq-dev, libtool
 Description: Pair-end read assembler -- Development tools
  PANDA assembles forward and reverse reads from Illumina SAM/BAM data
  .
