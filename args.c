@@ -104,8 +104,14 @@ bool panda_args_sam_setup(
 }
 
 const panda_tweak_general args_filename = { 'f', false, "file.sam", "Input SAM/BAM file containing forward reads." };
-const panda_tweak_general args_bin = { 'b', true, NULL, "Read a binary (BAM) file rather than a text (SAM) file." };
-const panda_tweak_general args_code = { 'B', true, "code", "Replace the Illumina multiplexing barcode stripped during processing into SAM/BAM." };
+
+const panda_tweak_general args_bin = { 'b', true, NULL,
+	"Read a binary (BAM) file rather than a text (SAM) file."
+};
+
+const panda_tweak_general args_code = { 'B', true, "code",
+	"Replace the Illumina multiplexing barcode stripped during processing into SAM/BAM."
+};
 
 const panda_tweak_general *const panda_args_sam_args[] = {
 	&args_code,
