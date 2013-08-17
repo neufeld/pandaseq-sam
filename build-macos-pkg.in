@@ -1,0 +1,4 @@
+#!/bin/sh
+
+make DESTDIR=$(pwd)/pkgroot install
+pkgbuild --identifier com.github.neufeld.pandaseq-sam --version @PACKAGE_VERSION@ --root pkgroot PANDAseq-SAM-@PACKAGE_VERSION@.pkg

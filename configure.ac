@@ -41,4 +41,5 @@ LIB_VER=0:0:0
 AC_SUBST(LIB_VER)
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([${LIB_NAME}.pc:${LIB_NAME}.pc.in], , [LIB_NAME=$LIB_NAME])
+AC_CONFIG_FILES([build-macos-pkg:build-macos-pkg.in], [chmod +x build-macos-pkg])
 AC_OUTPUT
