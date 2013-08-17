@@ -9,14 +9,16 @@
 Makefile
 Makefile.in
 aclocal.m4
+ar-lib
 autom4te.cache
 build-stamp
+compile
 config.*
 configure
 debian/*debhelper*
 debian/*substvars
 debian/files
-debian/libpandaseq-sam0
+debian/libpandaseq-sam*
 debian/pandaseq-sam-dbg
 debian/pandaseq-sam-dev
 debian/tmp/
