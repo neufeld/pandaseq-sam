@@ -15,7 +15,7 @@ pandaseq_sam_CPPFLAGS = $(PANDASEQ_CFLAGS) -std=gnu99 -pedantic -g
 pandaseq_sam_LDFLAGS = $(PANDASEQ_LIBS) libpandaseq-sam.la
 pandaseq_sam_SOURCES = main.c
 libpandaseq_sam_la_CPPFLAGS = \
-	$(LIB_LIBS) \
+	$(LIB_CPPFLAGS) \
 	$(PANDASEQ_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	-g \
@@ -24,7 +24,7 @@ libpandaseq_sam_la_CPPFLAGS = \
 	$(NULL)
 libpandaseq_sam_la_CFLAGS = $(LIB_CFLAGS)
 libpandaseq_sam_la_LDFLAGS = \
-	$(LIB_CPPFLAGS) \
+	$(LIB_LIBS) \
 	$(PANDASEQ_LIBS) \
 	$(PTHREAD_LIBS) \
 	-export-symbols-regex '^panda_' \
