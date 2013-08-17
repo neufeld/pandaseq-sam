@@ -1,4 +1,4 @@
-AC_INIT([pandaseq-sam], [1.0], [andre@masella.name])
+AC_INIT([pandaseq-sam], [1.1], [andre@masella.name])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS(config.h)
@@ -37,7 +37,7 @@ LIBS="$PLAIN_LIBS"
 LIB_NAME=pandaseq-sam-1
 AC_SUBST(LIB_NAME)
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html#Updating-version-info
-LIB_VER=0:0:0
+LIB_VER=1:0:0
 AC_SUBST(LIB_VER)
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([${LIB_NAME}.pc:${LIB_NAME}.pc.in], , [LIB_NAME=$LIB_NAME])

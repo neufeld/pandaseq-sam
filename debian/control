@@ -12,7 +12,7 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, pandaseq
 Description: Pair-end read assembler
  PANDA assembles forward and reverse reads from Illumina SAM/BAM data
 
-Package: libpandaseq-sam0
+Package: libpandaseq-sam1
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Pair-end read assembler
