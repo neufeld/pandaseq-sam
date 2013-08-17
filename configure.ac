@@ -18,17 +18,27 @@ AC_CHECK_TYPES([bam1_t, khiter_t], [], [AC_MSG_ERROR([*** samtools is required, 
 		#include "samtools/khash.h"
 	]])
 
-ACX_PTHREAD
+ACX_PTHREAD(, [ AC_MSG_ERROR([*** pthreads are required.]) ])
 AC_CHECK_HEADERS([math.h])
 AC_CHECK_LIB([m],[pow])
 AC_CHECK_HEADER([zlib.h], [], [AC_MSG_ERROR([*** zlib.h is required, install zlib header files])])
 AC_CHECK_LIB([z], [gzopen], [], [AC_MSG_ERROR([*** gzopen is required, install zlib library files])])
+case "$host" in
+*-mingw*)
+	LIBS="$LIBS -lws2_32"
+	NO_UNDEFINED='-no-undefined'
+	CPPFLAGS="$CPPFLAGS -march=i486"
+	;;
+*)
+	NO_UNDEFINED=''
+esac
 LIB_CPPFLAGS="$CPPFLAGS"
 LIB_CFLAGS="$CFLAGS"
 LIB_LIBS="$LIBS"
 AC_SUBST(LIB_CPPFLAGS)
 AC_SUBST(LIB_CFLAGS)
 AC_SUBST(LIB_LIBS)
+AC_SUBST(NO_UNDEFINED)
 
 PKG_CHECK_MODULES(PANDASEQ, [ pandaseq-2 >= 2.5 ])
 

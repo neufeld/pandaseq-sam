@@ -26,6 +26,15 @@
 #                define EXTERN_C_BEGIN
 #                define EXTERN_C_END
 #        endif
+#        ifdef _WIN32
+#                ifdef PANDA_SAM_LIB_COMPILING
+#                        define PANDA_SAM_EXTERN extern __declspec(dllexport)
+#                else
+#                        define PANDA_SAM_EXTERN extern __declspec(dllimport)
+#                endif
+#        else
+#                define PANDA_SAM_EXTERN extern
+#        endif
 EXTERN_C_BEGIN
 /**
  * Get the version of the underlying SAM tools library used.
@@ -84,8 +93,8 @@ typedef struct panda_args_sam *PandaArgsSam;
 /**
  * Command line arguments for a SAM file of pair-end reads.
  */
-extern const panda_tweak_general *const panda_args_sam_args[];
-extern const size_t panda_args_sam_args_length;
+PANDA_SAM_EXTERN const panda_tweak_general *const panda_args_sam_args[];
+PANDA_SAM_EXTERN const size_t panda_args_sam_args_length;
 
 /**
  * Create a new argument handler.
