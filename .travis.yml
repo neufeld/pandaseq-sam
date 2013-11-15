@@ -1,7 +1,10 @@
 language: c
 before_script:
-  - sudo apt-add-repository ppa:neufeldlab/ppa
+  - sudo apt-add-repository -y ppa:neufeldlab/ppa
   - sudo apt-get update -qq
   - sudo apt-get install -qq pandaseq-dev
   - ./autogen.sh
 script: "./configure && make"
+notifications:
+  on_success: never
+  on_failure: change
