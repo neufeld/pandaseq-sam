@@ -1,3 +1,9 @@
+pandaseq-sam (1.2~ppa0) precise; urgency=low
+
+  * Minor bug fixes
+
+ -- Andre Masella <andre@masella.name>  Sat, 22 Mar 2014 14:29:51 -0700
+
 pandaseq-sam (1.1~ppa1) precise; urgency=low
 
   * Recompile against new PANDAseq library.

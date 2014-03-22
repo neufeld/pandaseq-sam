@@ -1,4 +1,4 @@
-AC_INIT([pandaseq-sam], [1.1], [andre@masella.name])
+AC_INIT([pandaseq-sam], [1.2], [andre@masella.name])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS(config.h)
