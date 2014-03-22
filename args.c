@@ -44,6 +44,7 @@ PandaArgsSam panda_args_sam_new(
 	data->binary = false;
 	data->filename = NULL;
 	data->tag[0] = '\0';
+	return data;
 }
 
 void panda_args_sam_free(
