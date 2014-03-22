@@ -77,15 +77,6 @@ PandaAssembler panda_assembler_open_sam(
 	bool binary,
 	const char *tag);
 /**
- * Create a new multiplexed reader for given a SAM file.
- * @see panda_create_sam_reader
- */
-PandaMux panda_mux_open_sam(
-	const char *filename,
-	PandaLogProxy logger,
-	bool binary,
-	const char *tag);
-/**
  * The standard argument handler for a SAM file of pair-end reads.
  */
 typedef struct panda_args_sam *PandaArgsSam;

@@ -21,6 +21,7 @@
 #include "pandaseq-sam.h"
 #ifdef HAVE_PTHREAD
 #        include <pthread.h>
+#        include "pandaseq-sam-mux.h"
 #endif
 #include <sam.h>
 

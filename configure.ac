@@ -2,6 +2,7 @@ AC_INIT([pandaseq-sam], [1.1], [andre@masella.name])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS(config.h)
+AC_ARG_ENABLE(threads, AC_HELP_STRING([--disable-threads], [disable thread support (default is autodetect)]))
 AM_PROG_AR
 AM_PROG_CC_C_O
 AC_PROG_LIBTOOL
@@ -18,7 +19,13 @@ AC_CHECK_TYPES([bam1_t, khiter_t], [], [AC_MSG_ERROR([*** samtools is required, 
 		#include "samtools/khash.h"
 	]])
 
-ACX_PTHREAD(, [ AC_MSG_ERROR([*** pthreads are required.]) ])
+if test "$enable_threads" != no; then
+	ACX_PTHREAD
+else
+	acx_pthread_ok=no
+fi
+AM_CONDITIONAL([PTHREAD], [test x$acx_pthread_ok = xyes])
+
 AC_CHECK_HEADERS([math.h])
 AC_CHECK_LIB([m],[pow])
 AC_CHECK_HEADER([zlib.h], [], [AC_MSG_ERROR([*** zlib.h is required, install zlib header files])])

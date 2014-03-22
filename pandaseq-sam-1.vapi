@@ -37,8 +37,8 @@ namespace Panda.SAM {
 	 * Create a new multiplexed reader for given a SAM file.
 	 * @see create_reader
 	 */
-	[CCode(cname = "panda_mux_open_sam")]
-	public Mux? open_mux(string filename, LogProxy logger, bool binary, string? tag = null);
+	[CCode (cname = "panda_mux_open_sam", cheader_filename = "pandaseq-sam-mux.h")]
+	public Mux? open_mux (string filename, LogProxy logger, bool binary, string? tag = null);
 
 	/**
 	 * The standard argument handler for a SAM file of pair-end reads.

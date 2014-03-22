@@ -4,6 +4,9 @@ bin_PROGRAMS = pandaseq-sam
 lib_LTLIBRARIES = libpandaseq-sam.la
 library_includedir=$(includedir)/$(LIB_NAME)
 library_include_HEADERS = pandaseq-sam.h
+if PTHREAD
+library_include_HEADERS += pandaseq-sam-mux.h
+endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = $(LIB_NAME).pc
 vapidir = $(datadir)/vala/vapi
