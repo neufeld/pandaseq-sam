@@ -20,7 +20,6 @@ pandaseq_sam_LDADD = libpandaseq-sam.la
 pandaseq_sam_SOURCES = main.c
 libpandaseq_sam_la_CPPFLAGS = \
 	$(HTS_CFLAGS) \
-	$(LIB_CPPFLAGS) \
 	$(PANDASEQ_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	-DPANDA_SAM_LIB_COMPILING \
@@ -28,15 +27,13 @@ libpandaseq_sam_la_CPPFLAGS = \
 	-Isamtools \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_USE_KNETFILE \
 	$(NULL)
-libpandaseq_sam_la_CFLAGS = $(LIB_CFLAGS)
 libpandaseq_sam_la_LDFLAGS = \
 	$(HTS_LIBS) \
-	$(LIB_LIBS) \
 	$(PANDASEQ_LIBS) \
 	$(PTHREAD_LIBS) \
 	-export-symbols-regex '^panda_' \
  	-version-info $(LIB_VER) \
-	$(NO_UNDEFINED) \
+	-no-undefined \
 	$(NULL)
 libpandaseq_sam_la_SOURCES = \
 	args.c \
