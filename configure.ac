@@ -24,8 +24,6 @@ AM_CONDITIONAL([PTHREAD], [test x$acx_pthread_ok = xyes])
 # This is here because libhts does not correctly link again libm
 AC_CHECK_LIB([m],[pow])
 
-AC_CHECK_HEADER([htslib/sam.h], [], [AC_MSG_ERROR([*** htslib is required, install htslib header files])])
-AC_CHECK_LIB([hts], [hts_open], [], [AC_MSG_ERROR([*** htslib is required, install htslib library files])], "$PTHREAD_CFLAGS")
 case "$host" in
 *-mingw*)
 	LIBS="$LIBS -lws2_32"
@@ -44,6 +42,10 @@ AC_SUBST(LIB_LIBS)
 AC_SUBST(NO_UNDEFINED)
 
 PKG_CHECK_MODULES(PANDASEQ, [ pandaseq-2 >= 2.5 ])
+PKG_CHECK_MODULES(HTS, [ htslib ], [], [
+	AC_CHECK_HEADER([htslib/sam.h], [], [AC_MSG_ERROR([*** htslib is required, install htslib header files])])
+	AC_CHECK_LIB([hts], [hts_open], [], [AC_MSG_ERROR([*** htslib is required, install htslib library files])], "$PTHREAD_CFLAGS")
+])
 
 CPPFLAGS="$PLAIN_CPPFLAGS"
 CFLAGS="$PLAIN_CFLAGS"
