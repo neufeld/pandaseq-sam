@@ -23,11 +23,11 @@
 #        include <pthread.h>
 #        include "pandaseq-sam-mux.h"
 #endif
-#include <sam.h>
+#include <htslib/sam.h>
 
 const char *panda_sam_version(
 	void) {
-	return BAM_VERSION;
+	return hts_version();
 }
 
 PandaAssembler panda_assembler_open_sam(

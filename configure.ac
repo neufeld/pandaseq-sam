@@ -14,11 +14,6 @@ PLAIN_CPPFLAGS="$CPPFLAGS"
 PLAIN_CFLAGS="$CFLAGS"
 PLAIN_LIBS="$LIBS"
 
-AC_CHECK_TYPES([bam1_t, khiter_t], [], [AC_MSG_ERROR([*** samtools is required, install the samtools sources in this directory. See the README for details])], [[
-		#include "samtools/sam.h"
-		#include "samtools/khash.h"
-	]])
-
 if test "$enable_threads" != no; then
 	ACX_PTHREAD
 else
@@ -26,10 +21,11 @@ else
 fi
 AM_CONDITIONAL([PTHREAD], [test x$acx_pthread_ok = xyes])
 
-AC_CHECK_HEADERS([math.h])
+# This is here because libhts does not correctly link again libm
 AC_CHECK_LIB([m],[pow])
-AC_CHECK_HEADER([zlib.h], [], [AC_MSG_ERROR([*** zlib.h is required, install zlib header files])])
-AC_CHECK_LIB([z], [gzopen], [], [AC_MSG_ERROR([*** gzopen is required, install zlib library files])])
+
+AC_CHECK_HEADER([htslib/sam.h], [], [AC_MSG_ERROR([*** htslib is required, install htslib header files])])
+AC_CHECK_LIB([hts], [hts_open], [], [AC_MSG_ERROR([*** htslib is required, install htslib library files])], "$PTHREAD_CFLAGS")
 case "$host" in
 *-mingw*)
 	LIBS="$LIBS -lws2_32"

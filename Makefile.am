@@ -41,24 +41,5 @@ libpandaseq_sam_la_SOURCES = \
 	reader.c \
 	seqid.c \
 	support.c \
-	samtools/bam_aux.c \
-	samtools/bam.c \
-	samtools/bam_cat.c \
-	samtools/bam_import.c \
-	samtools/bam_index.c \
-	samtools/bam_lpileup.c \
-	samtools/bam_md.c \
-	samtools/bam_pileup.c \
-	samtools/bam_reheader.c \
-	samtools/bam_sort.c \
-	samtools/bedidx.c \
-	samtools/bgzf.c \
-	samtools/faidx.c \
-	samtools/knetfile.c \
-	samtools/kprobaln.c \
-	samtools/kstring.c \
-	samtools/razf.c \
-	samtools/sam.c \
-	samtools/sam_header.c \
 	$(NULL)
 
