@@ -14,8 +14,8 @@ dist_vapi_DATA = $(LIB_NAME).vapi $(LIB_NAME).deps
 man1_MANS = pandaseq-sam.1
 docdir = $(datadir)/doc/@PACKAGE@
 doc_DATA = README
-pandaseq_sam_CPPFLAGS = $(PANDASEQ_CFLAGS) -std=gnu99 -pedantic -g
-pandaseq_sam_LDFLAGS = $(PANDASEQ_LIBS) libpandaseq-sam.la
+pandaseq_sam_CPPFLAGS = $(PANDASEQ_CFLAGS) -std=c99 -pedantic -g
+pandaseq_sam_LDFLAGS = $(PANDASEQ_LIBS)
 pandaseq_sam_LDADD = libpandaseq-sam.la
 pandaseq_sam_SOURCES = main.c
 libpandaseq_sam_la_CPPFLAGS = \
@@ -24,7 +24,6 @@ libpandaseq_sam_la_CPPFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	-DPANDA_SAM_LIB_COMPILING \
 	-g \
-	-Isamtools \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_USE_KNETFILE \
 	$(NULL)
 libpandaseq_sam_la_LDFLAGS = \
