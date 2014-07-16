@@ -28,19 +28,44 @@ bool panda_seqid_parse_sam(
 	panda_seq_identifier *id,
 	char *input) {
 	char *dest;
+	size_t it;
 	int value;
 	if (strpbrk(input, "/#") != NULL) {
 		return false;
 	}
-	id->run = 0;
-	id->flowcell[0] = '\0';
-	id->tag[0] = '\0';
-	dest = id->instrument;
-	PARSE_CHUNK {
-		*dest++ = (*input);
+	value = 0;
+	for (it = 0; it < strlen(input); it++) {
+		if (input[it] == ':') {
+			value++;
+		}
 	}
-	input++;
-	*dest = '\0';
+	id->tag[0] = '\0';
+	if (value == 6) {
+		dest = id->instrument;
+		PARSE_CHUNK {
+			*dest++ = (*input);
+		}
+		input++;
+		*dest = '\0';
+		PARSE_INT;
+		input++;
+		id->run = value;
+		dest = id->flowcell;
+		PARSE_CHUNK {
+			*dest++ = (*input);
+		}
+		input++;
+		*dest = '\0';
+	} else {
+		id->run = 0;
+		id->flowcell[0] = '\0';
+		dest = id->instrument;
+		PARSE_CHUNK {
+			*dest++ = (*input);
+		}
+		input++;
+		*dest = '\0';
+	}
 	PARSE_INT;
 	input++;
 	id->lane = value;
