@@ -68,7 +68,22 @@ bool ps_next(
 	*reverse = NULL;
 	*reverse_length = 0;
 	while ((res = sam_read1(data->file, data->header, seq)) > 0) {
-		if (seq->core.l_qseq < 1 || seq->core.l_qseq > PANDA_MAX_LEN || !(seq->core.flag & BAM_FPAIRED)) {
+		if (seq->core.l_qseq < 1) {
+			if (panda_debug_flags & PANDA_DEBUG_FILE) {
+				panda_log_proxy_write(data->logger, PANDA_CODE_NO_DATA, NULL, NULL, bam_get_qname(seq));
+			}
+			continue;
+		}
+		if (seq->core.l_qseq > PANDA_MAX_LEN) {
+			if (panda_debug_flags & PANDA_DEBUG_FILE) {
+				panda_log_proxy_write(data->logger, PANDA_CODE_READ_TOO_LONG, NULL, NULL, bam_get_qname(seq));
+			}
+			continue;
+		}
+		if (!(seq->core.flag & BAM_FPAIRED)) {
+			if (panda_debug_flags & PANDA_DEBUG_FILE) {
+				panda_log_proxy_write(data->logger, PANDA_CODE_NOT_PAIRED, NULL, NULL, bam_get_qname(seq));
+			}
 			continue;
 		}
 		key = kh_get(seq, data->pool, bam_get_qname(seq));
