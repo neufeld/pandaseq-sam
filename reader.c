@@ -207,7 +207,7 @@ PandaNextSeq panda_create_sam_reader(
 		memcpy(data->tag, tag, data->tag_length);
 		data->tag[data->tag_length] = '\0';
 	}
-	data->header = bam_hdr_init();
+	data->header = sam_hdr_read(data->file);
 	data->logger = panda_log_proxy_ref(logger);
 	*destroy = (PandaDestroy) ps_destroy;
 	*user_data = data;
