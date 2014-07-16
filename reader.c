@@ -105,11 +105,11 @@ bool ps_next(
 			kh_del(seq, data->pool, key);
 
 			if (!panda_seqid_parse_sam(id, bam_get_qname(seq))) {
-				bam_destroy1(mate);
-				bam_destroy1(seq);
 				if (panda_debug_flags & PANDA_DEBUG_FILE) {
 					panda_log_proxy_write(data->logger, PANDA_CODE_ID_PARSE_FAILURE, NULL, NULL, bam_get_qname(seq));
 				}
+				bam_destroy1(mate);
+				bam_destroy1(seq);
 				return false;
 			}
 			memcpy(id->tag, data->tag, data->tag_length + 1);
