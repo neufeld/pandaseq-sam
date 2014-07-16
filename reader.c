@@ -67,7 +67,7 @@ bool ps_next(
 	*forward_length = 0;
 	*reverse = NULL;
 	*reverse_length = 0;
-	while ((res = sam_read1(data->file, data->header, seq)) > 0) {
+	while ((res = sam_read1(data->file, data->header, seq)) >= 0) {
 		if (seq->core.l_qseq < 1) {
 			if (panda_debug_flags & PANDA_DEBUG_FILE) {
 				panda_log_proxy_write(data->logger, PANDA_CODE_NO_DATA, NULL, NULL, bam_get_qname(seq));
@@ -131,7 +131,8 @@ bool ps_next(
 			return true;
 		}
 	}
-	if (res == -2 && panda_debug_flags & PANDA_DEBUG_FILE) {
+	/* -1 is normal end of file. */
+	if (res < -1 && panda_debug_flags & PANDA_DEBUG_FILE) {
 		panda_log_proxy_write(data->logger, PANDA_CODE_PREMATURE_EOF, NULL, NULL, bam_get_qname(seq));
 	}
 	bam_destroy1(seq);
