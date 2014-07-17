@@ -68,6 +68,20 @@ PandaNextSeq panda_create_sam_reader(
 	void **user_data,
 	PandaDestroy *destroy);
 /**
+ * Create an object to read sequence from a SAM file
+ *
+ * @orphan_file: the FASTQ file where unpaired/damaged/broken reads should be place.
+ * @see: panda_create_sam_reader_orphans
+ */
+PandaNextSeq panda_create_sam_reader_orphans(
+	const char *filename,
+	PandaLogProxy logger,
+	bool binary,
+	const char *tag,
+	const char *orphan_file,
+	void **user_data,
+	PandaDestroy *destroy);
+/**
  * Create a new assembler for given a SAM file.
  * @see panda_create_sam_reader
  */

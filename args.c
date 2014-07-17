@@ -35,6 +35,7 @@
 struct panda_args_sam {
 	bool binary;
 	const char *filename;
+	const char *orphans_file;
 	char tag[PANDA_TAG_LEN];
 };
 
@@ -43,6 +44,7 @@ PandaArgsSam panda_args_sam_new(
 	PandaArgsSam data = malloc(sizeof(struct panda_args_sam));
 	data->binary = false;
 	data->filename = NULL;
+	data->orphans_file = NULL;
 	data->tag[0] = '\0';
 	return data;
 }
@@ -66,6 +68,9 @@ bool panda_args_sam_tweak(
 			fprintf(stderr, "Replacement tag %s is too long.", argument);
 			return false;
 		}
+		return true;
+	case 'r':
+		data->orphans_file = argument;
 		return true;
 	case 'f':
 		data->filename = (strcmp(optarg, "-") == 0) ? "/dev/stdin" : argument;
@@ -95,7 +100,7 @@ PandaNextSeq panda_args_sam_opener(
 		MAYBE(next_destroy) = NULL;
 		return false;
 	}
-	return panda_create_sam_reader(data->filename, logger, data->binary, data->tag, next_data, next_destroy);
+	return panda_create_sam_reader_orphans(data->filename, logger, data->binary, data->tag, data->orphans_file, next_data, next_destroy);
 }
 
 bool panda_args_sam_setup(
@@ -114,10 +119,15 @@ const panda_tweak_general args_code = { 'B', true, "code",
 	"Replace the Illumina multiplexing barcode stripped during processing into SAM/BAM."
 };
 
+const panda_tweak_general args_orphans = { 'r', true, "orphans.fastq",
+	"Write all reads from the SAM/BAM that could not be paired or were discarded to a FASTQ file."
+};
+
 const panda_tweak_general *const panda_args_sam_args[] = {
 	&args_code,
 	&args_bin,
-	&args_filename
+	&args_filename,
+	&args_orphans
 };
 
 const size_t panda_args_sam_args_length = sizeof(panda_args_sam_args) / sizeof(panda_tweak_general *);

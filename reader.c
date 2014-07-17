@@ -37,6 +37,7 @@ struct reader_data {
 	size_t tag_length;
 	char tag[PANDA_TAG_LEN];
 	bam_hdr_t *header;
+	FILE *orphan_file;
 };
 
 void ps_fill(
@@ -49,6 +50,59 @@ void ps_fill(
 		size_t pos = (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
 		seq[pos].nt = (panda_nt) (bam_seqi(bam_get_seq(bam), it));
 		seq[pos].qual = bam_get_qual(bam)[it];
+	}
+}
+
+bool damaged_seq(
+	bam1_t *seq,
+	PandaCode *code) {
+	if (seq->core.l_qseq < 1) {
+		*code = PANDA_CODE_NO_DATA;
+		return true;
+	}
+	if (seq->core.l_qseq > PANDA_MAX_LEN) {
+		*code = PANDA_CODE_READ_TOO_LONG;
+		return true;
+	}
+	if (!(seq->core.flag & BAM_FPAIRED)) {
+		*code = PANDA_CODE_NOT_PAIRED;
+		return true;
+	}
+	return false;
+}
+
+#define show_flag(x) if (seq->core.flag & x) fprintf(data->orphan_file, " " #x);
+
+void write_orphan(
+	struct reader_data *data,
+	bam1_t *seq,
+	PandaCode seq_err) {
+	if (data->orphan_file != NULL) {
+		size_t it;
+		fprintf(data->orphan_file, "@%s", bam_get_qname(seq));
+		show_flag(BAM_FPAIRED);
+		show_flag(BAM_FPROPER_PAIR);
+		show_flag(BAM_FUNMAP);
+		show_flag(BAM_FMUNMAP);
+		show_flag(BAM_FREVERSE);
+		show_flag(BAM_FMREVERSE);
+		show_flag(BAM_FREAD1);
+		show_flag(BAM_FREAD2);
+		show_flag(BAM_FSECONDARY);
+		show_flag(BAM_FQCFAIL);
+		show_flag(BAM_FDUP);
+		show_flag(BAM_FSUPPLEMENTARY);
+		fprintf(data->orphan_file, "\n");
+		for (it = 0; it < seq->core.l_qseq; it++) {
+			fputc(panda_nt_to_ascii((panda_nt) (bam_seqi(bam_get_seq(seq), it))), data->orphan_file);
+		}
+		fprintf(data->orphan_file, "\n+\n");
+		for (it = 0; it < seq->core.l_qseq; it++) {
+			fputc(33 + bam_get_qual(seq)[it], data->orphan_file);
+		}
+		fprintf(data->orphan_file, "\n");
+	} else if (panda_debug_flags & PANDA_DEBUG_FILE) {
+		panda_log_proxy_write(data->logger, seq_err, NULL, NULL, bam_get_qname(seq));
 	}
 }
 
@@ -68,22 +122,9 @@ bool ps_next(
 	*reverse = NULL;
 	*reverse_length = 0;
 	while ((res = sam_read1(data->file, data->header, seq)) >= 0) {
-		if (seq->core.l_qseq < 1) {
-			if (panda_debug_flags & PANDA_DEBUG_FILE) {
-				panda_log_proxy_write(data->logger, PANDA_CODE_NO_DATA, NULL, NULL, bam_get_qname(seq));
-			}
-			continue;
-		}
-		if (seq->core.l_qseq > PANDA_MAX_LEN) {
-			if (panda_debug_flags & PANDA_DEBUG_FILE) {
-				panda_log_proxy_write(data->logger, PANDA_CODE_READ_TOO_LONG, NULL, NULL, bam_get_qname(seq));
-			}
-			continue;
-		}
-		if (!(seq->core.flag & BAM_FPAIRED)) {
-			if (panda_debug_flags & PANDA_DEBUG_FILE) {
-				panda_log_proxy_write(data->logger, PANDA_CODE_NOT_PAIRED, NULL, NULL, bam_get_qname(seq));
-			}
+		PandaCode seq_err;
+		if (damaged_seq(seq, &seq_err)) {
+			write_orphan(data, seq, seq_err);
 			continue;
 		}
 		key = kh_get(seq, data->pool, bam_get_qname(seq));
@@ -147,14 +188,15 @@ void ps_destroy(
 	for (key = kh_begin(data->pool); key != kh_end(data->pool); key++) {
 		if (kh_exist(data->pool, key)) {
 			bam1_t *seq = kh_value(data->pool, key);
-			if (panda_debug_flags & PANDA_DEBUG_FILE) {
-				panda_log_proxy_write(data->logger, PANDA_CODE_PARSE_FAILURE, NULL, NULL, bam_get_qname(seq));
-			}
+			write_orphan(data, seq, PANDA_CODE_PARSE_FAILURE);
 			bam_destroy1(seq);
 		}
 	}
 	kh_destroy(seq, data->pool);
 	panda_log_proxy_unref(data->logger);
+	if (data->orphan_file != NULL) {
+		fclose(data->orphan_file);
+	}
 	free(data->forward);
 	free(data->reverse);
 	free(data);
@@ -165,6 +207,17 @@ PandaNextSeq panda_create_sam_reader(
 	PandaLogProxy logger,
 	bool binary,
 	const char *tag,
+	void **user_data,
+	PandaDestroy *destroy) {
+	return panda_create_sam_reader_orphans(filename, logger, binary, tag, NULL, user_data, destroy);
+}
+
+PandaNextSeq panda_create_sam_reader_orphans(
+	const char *filename,
+	PandaLogProxy logger,
+	bool binary,
+	const char *tag,
+	const char *orphan_file,
 	void **user_data,
 	PandaDestroy *destroy) {
 	struct reader_data *data;
@@ -207,6 +260,18 @@ PandaNextSeq panda_create_sam_reader(
 		}
 		memcpy(data->tag, tag, data->tag_length);
 		data->tag[data->tag_length] = '\0';
+	}
+	if (orphan_file == NULL) {
+		data->orphan_file = NULL;
+	} else {
+		data->orphan_file = fopen(orphan_file, "w");
+		if (data->orphan_file == NULL) {
+			perror(orphan_file);
+			hts_close(data->file);
+			free(data->forward);
+			free(data->reverse);
+			free(data);
+		}
 	}
 	data->header = sam_hdr_read(data->file);
 	data->logger = panda_log_proxy_ref(logger);
