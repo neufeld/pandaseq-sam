@@ -249,7 +249,6 @@ PandaNextSeq panda_create_sam_reader_orphans(
 		free(data);
 		return NULL;
 	}
-	data->pool = kh_init(seq);
 	if (tag == NULL) {
 		data->tag_length = 0;
 		data->tag[0] = '\0';
@@ -273,6 +272,7 @@ PandaNextSeq panda_create_sam_reader_orphans(
 			free(data);
 		}
 	}
+	data->pool = kh_init(seq);
 	data->header = sam_hdr_read(data->file);
 	data->logger = panda_log_proxy_ref(logger);
 	*destroy = (PandaDestroy) ps_destroy;
