@@ -270,6 +270,7 @@ PandaNextSeq panda_create_sam_reader_orphans(
 			free(data->forward);
 			free(data->reverse);
 			free(data);
+			return NULL;
 		}
 	}
 	data->pool = kh_init(seq);
