@@ -17,7 +17,7 @@ doc_DATA = README
 COMMON_CPPFLAGS = \
 	-std=c99 \
 	-g \
-	-Wall -Wextra -Wformat -Wpedantic \
+	-Wall -Wextra -Wformat \
 	$(NULL)
 pandaseq_sam_CPPFLAGS = $(PANDASEQ_CFLAGS) $(COMMON_CPPFLAGS)
 pandaseq_sam_LDFLAGS = $(PANDASEQ_LIBS)
