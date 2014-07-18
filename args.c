@@ -37,6 +37,8 @@ struct panda_args_sam {
 	const char *filename;
 	const char *orphans_file;
 	char tag[PANDA_TAG_LEN];
+	bool no_algn_qual;
+	PandaWriter no_algn_writer;
 };
 
 PandaArgsSam panda_args_sam_new(
@@ -46,11 +48,14 @@ PandaArgsSam panda_args_sam_new(
 	data->filename = NULL;
 	data->orphans_file = NULL;
 	data->tag[0] = '\0';
+	data->no_algn_qual = false;
+	data->no_algn_writer = NULL;
 	return data;
 }
 
 void panda_args_sam_free(
 	PandaArgsSam data) {
+	panda_writer_unref(data->no_algn_writer);
 	free(data);
 }
 
@@ -75,6 +80,14 @@ bool panda_args_sam_tweak(
 	case 'f':
 		data->filename = (strcmp(optarg, "-") == 0) ? "/dev/stdin" : argument;
 		return true;
+	case 'u':
+	case 'U':
+		data->no_algn_qual = flag == 'U';
+		panda_writer_unref(data->no_algn_writer);
+		data->no_algn_writer = panda_writer_open_file(argument, false);
+		if (data->no_algn_writer == NULL)
+			perror(argument);
+		return (data->no_algn_writer != NULL);
 	default:
 		return false;
 	}
@@ -91,9 +104,16 @@ PandaNextSeq panda_args_sam_opener(
 	void **next_data,
 	PandaDestroy *next_destroy) {
 
-	MAYBE(fail) = NULL;
-	MAYBE(fail_data) = NULL;
-	MAYBE(fail_destroy) = NULL;
+	if (data->no_algn_writer != NULL) {
+		*fail = (PandaFailAlign) (data->no_algn_qual ? panda_output_fail_qual : panda_output_fail);
+		*fail_data = data->no_algn_writer;
+		*fail_destroy = (PandaDestroy) panda_writer_unref;
+		data->no_algn_writer = NULL;
+	} else {
+		*fail = NULL;
+		*fail_data = NULL;
+		*fail_destroy = NULL;
+	}
 
 	if (data->filename == NULL) {
 		MAYBE(next_data) = NULL;
@@ -116,16 +136,22 @@ const panda_tweak_general args_filename = { 'f', false, "file.sam", "Input SAM/B
 
 const panda_tweak_general args_bin = { 'b', true, NULL, "Read a binary (BAM) file rather than a text (SAM) file.", false };
 
+static const panda_tweak_general args_unalign_qual = { 'U', true, "unaligned.txt", "File to write unalignable read pairs with quality scores.", false };
+
 const panda_tweak_general args_code = { 'B', true, "code", "Replace the Illumina multiplexing barcode stripped during processing into SAM/BAM.", false };
 
 const panda_tweak_general args_orphans = { 'r', true, "orphans.fastq", "Write all reads from the SAM/BAM that could not be paired or were discarded to a FASTQ file.", false
 };
 
+static const panda_tweak_general args_unalign = { 'u', true, "unaligned.txt", "File to write unalignable read pairs.", false };
+
 const panda_tweak_general *const panda_args_sam_args[] = {
 	&args_code,
 	&args_bin,
+	&args_unalign_qual,
 	&args_filename,
-	&args_orphans
+	&args_orphans,
+	&args_unalign
 };
 
 const size_t panda_args_sam_args_length = sizeof(panda_args_sam_args) / sizeof(panda_tweak_general *);
