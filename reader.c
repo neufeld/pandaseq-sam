@@ -17,6 +17,8 @@
  */
 
 #include "config.h"
+#include <errno.h>
+#include <unistd.h>
 
 #include "pandaseq-sam.h"
 #include <htslib/hts.h>
@@ -263,9 +265,16 @@ PandaNextSeq panda_create_sam_reader_orphans(
 	if (orphan_file == NULL) {
 		data->orphan_file = NULL;
 	} else {
-		data->orphan_file = fopen(orphan_file, "w");
+		data->orphan_file = NULL;
+		if (access(orphan_file, F_OK) == -1 && errno == ENOENT) {
+			data->orphan_file = fopen(orphan_file, "w");
+			if (data->orphan_file == NULL) {
+				perror(orphan_file);
+			}
+		} else {
+			fprintf(stderr, "%s: refusing to overwrite file.\n", orphan_file);
+		}
 		if (data->orphan_file == NULL) {
-			perror(orphan_file);
 			hts_close(data->file);
 			free(data->forward);
 			free(data->reverse);
