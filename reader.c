@@ -25,7 +25,7 @@
 #include <htslib/khash.h>
 #include <htslib/sam.h>
 
-KHASH_MAP_INIT_STR(seq, bam1_t *);
+KHASH_MAP_INIT_STR(seq, bam1_t *)
 
 struct reader_data {
 	htsFile *file;
@@ -62,7 +62,7 @@ bool damaged_seq(
 		*code = PANDA_CODE_NO_DATA;
 		return true;
 	}
-	if (seq->core.l_qseq > PANDA_MAX_LEN) {
+	if ((size_t) seq->core.l_qseq > PANDA_MAX_LEN) {
 		*code = PANDA_CODE_READ_TOO_LONG;
 		return true;
 	}
@@ -95,11 +95,11 @@ void write_orphan(
 		show_flag(BAM_FDUP);
 		show_flag(BAM_FSUPPLEMENTARY);
 		fprintf(data->orphan_file, "\n");
-		for (it = 0; it < seq->core.l_qseq; it++) {
+		for (it = 0; it < (size_t) seq->core.l_qseq; it++) {
 			fputc(panda_nt_to_ascii((panda_nt) (bam_seqi(bam_get_seq(seq), it))), data->orphan_file);
 		}
 		fprintf(data->orphan_file, "\n+\n");
-		for (it = 0; it < seq->core.l_qseq; it++) {
+		for (it = 0; it < (size_t) seq->core.l_qseq; it++) {
 			fputc(33 + bam_get_qual(seq)[it], data->orphan_file);
 		}
 		fprintf(data->orphan_file, "\n");

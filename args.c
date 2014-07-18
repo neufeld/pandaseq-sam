@@ -106,21 +106,19 @@ PandaNextSeq panda_args_sam_opener(
 bool panda_args_sam_setup(
 	PandaArgsSam data,
 	PandaAssembler assembler) {
+
+	(void) data;
+	(void) assembler;
 	return true;
 }
 
-const panda_tweak_general args_filename = { 'f', false, "file.sam", "Input SAM/BAM file containing forward reads." };
+const panda_tweak_general args_filename = { 'f', false, "file.sam", "Input SAM/BAM file containing forward reads.", false };
 
-const panda_tweak_general args_bin = { 'b', true, NULL,
-	"Read a binary (BAM) file rather than a text (SAM) file."
-};
+const panda_tweak_general args_bin = { 'b', true, NULL, "Read a binary (BAM) file rather than a text (SAM) file.", false };
 
-const panda_tweak_general args_code = { 'B', true, "code",
-	"Replace the Illumina multiplexing barcode stripped during processing into SAM/BAM."
-};
+const panda_tweak_general args_code = { 'B', true, "code", "Replace the Illumina multiplexing barcode stripped during processing into SAM/BAM.", false };
 
-const panda_tweak_general args_orphans = { 'r', true, "orphans.fastq",
-	"Write all reads from the SAM/BAM that could not be paired or were discarded to a FASTQ file."
+const panda_tweak_general args_orphans = { 'r', true, "orphans.fastq", "Write all reads from the SAM/BAM that could not be paired or were discarded to a FASTQ file.", false
 };
 
 const panda_tweak_general *const panda_args_sam_args[] = {
