@@ -1,4 +1,4 @@
-PANDASEQ-SAM
+![PANDASEQ-SAM](https://rawgithub.com/neufeld/pandaseq/master/pandaseq.svg)
 ============
 
 PANDASEQ-SAM is a program to align Illumina reads, optionally with PCR primers embedded in the sequence, and reconstruct an overlapping sequence. This version works on SAM/BAM formatted files.
