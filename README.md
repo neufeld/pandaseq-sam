@@ -22,6 +22,10 @@ If you receive an error that `libpandaseq-sam.so.0` is not found, try running:
 
     sudo ldconfig
 
+If you have problems locating `htslib/sam.h` on newer version of MacOS, try running:
+
+    ./autogen.sh && CPPFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib ./configure && make && sudo make install
+
 USAGE
 -----
 
