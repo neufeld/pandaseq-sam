@@ -36,7 +36,11 @@ The location of the reads in SAM or BAM format. Use \fB-\fR to read from standar
 Writes a FASTQ of all the reads that were rejected by the reader. These were reads that could not be matched to a mate due to either bad SAM flags or the mate being missing from the file. It will also collect any reads that were too long or too short. The SAM flags are printed on the header line in human-readable format.
 
 .SH SAM FLAGS
-Each SAM sequence is associated with flags that describe the sequence. PANDAseq expects that \fIBAM_FPAIRED\fR to be set on both sequences, \fBBAM_FREVERSE\fR to be set on one of the sequences and \fBBAM_FREAD1\fR to be set on one of the sequences. Normally, \fBBAM_FREVERSE\fR and \fBBAM_FREAD1\fR are set on opposite sequences in a mate pair, but this is not a strict requirement.
+Each SAM sequence is associated with flags that describe the sequence. PANDAseq expects that \fIBAM_FPAIRED\fR to be set on both sequences, \fBBAM_FREVERSE\fR to be set on one of the sequences and \fBBAM_FREAD1\fR to be set on one of the sequences. Normally, \fBBAM_FREVERSE\fR and \fBBAM_FREAD1\fR are set on opposite sequences in a mate pair, but this is not a strict requirement. See
+.BR sam (5).
+
 .SH SEE ALSO
 .BR pandaseq (1),
-.BR pandaxs (1).
+.BR pandaxs (1),
+.BR samtools (1),
+.BR sam (5).

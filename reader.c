@@ -73,7 +73,7 @@ bool damaged_seq(
 	return false;
 }
 
-#define show_flag(x) if (seq->core.flag & x) fprintf(data->orphan_file, " " #x);
+#define show_flag(flag_value, ch) if (seq->core.flag & flag_value) fputc(ch, data->orphan_file);
 
 void write_orphan(
 	struct reader_data *data,
@@ -82,18 +82,18 @@ void write_orphan(
 	if (data->orphan_file != NULL) {
 		size_t it;
 		fprintf(data->orphan_file, "@%s", bam_get_qname(seq));
-		show_flag(BAM_FPAIRED);
-		show_flag(BAM_FPROPER_PAIR);
-		show_flag(BAM_FUNMAP);
-		show_flag(BAM_FMUNMAP);
-		show_flag(BAM_FREVERSE);
-		show_flag(BAM_FMREVERSE);
-		show_flag(BAM_FREAD1);
-		show_flag(BAM_FREAD2);
-		show_flag(BAM_FSECONDARY);
-		show_flag(BAM_FQCFAIL);
-		show_flag(BAM_FDUP);
-		show_flag(BAM_FSUPPLEMENTARY);
+		show_flag(BAM_FPAIRED, 'p');
+		show_flag(BAM_FPROPER_PAIR, 'P');
+		show_flag(BAM_FUNMAP, 'u');
+		show_flag(BAM_FMUNMAP, 'U');
+		show_flag(BAM_FREVERSE, 'r');
+		show_flag(BAM_FMREVERSE, 'R');
+		show_flag(BAM_FREAD1, '1');
+		show_flag(BAM_FREAD2, '2');
+		show_flag(BAM_FSECONDARY, 's');
+		show_flag(BAM_FQCFAIL, 'f');
+		show_flag(BAM_FDUP, 'd');
+		show_flag(BAM_FSUPPLEMENTARY, 'S');
 		fprintf(data->orphan_file, "\n");
 		for (it = 0; it < (size_t) seq->core.l_qseq; it++) {
 			fputc(panda_nt_to_ascii((panda_nt) (bam_seqi(bam_get_seq(seq), it))), data->orphan_file);
