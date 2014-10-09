@@ -35,6 +35,9 @@ The location of the reads in SAM or BAM format. Use \fB-\fR to read from standar
 \-r orphans.fastq
 Writes a FASTQ of all the reads that were rejected by the reader. These were reads that could not be matched to a mate due to either bad SAM flags or the mate being missing from the file. It will also collect any reads that were too long or too short. The SAM flags are printed on the header line in human-readable format.
 
+.SH NOTES
+The reverse read is slightly different in SAM/BAM from FASTQ: in FASTQ, the read is stored as it came of the sequencer, while in SAM/BAM, the complement is stored so that the forward and reverse reads in a mate pair are in the same orientation. This is handled properly, but it means that if using \fBsamtools view\fR to pick out the reverse primer, the complement of the reverse primer is displayed instead.
+
 .SH SAM FLAGS
 Each SAM sequence is associated with flags that describe the sequence. PANDAseq expects that \fIBAM_FPAIRED\fR to be set on both sequences, \fBBAM_FREVERSE\fR to be set on one of the sequences and \fBBAM_FREAD1\fR to be set on one of the sequences. Normally, \fBBAM_FREVERSE\fR and \fBBAM_FREAD1\fR are set on opposite sequences in a mate pair, but this is not a strict requirement. See
 .BR sam (5).
