@@ -39,6 +39,7 @@ struct panda_args_sam {
 	char tag[PANDA_TAG_LEN];
 	bool no_algn_qual;
 	PandaWriter no_algn_writer;
+	bool reverse_direction;
 };
 
 PandaArgsSam panda_args_sam_new(
@@ -50,6 +51,7 @@ PandaArgsSam panda_args_sam_new(
 	data->tag[0] = '\0';
 	data->no_algn_qual = false;
 	data->no_algn_writer = NULL;
+	data->reverse_direction = true;
 	return data;
 }
 
@@ -73,6 +75,9 @@ bool panda_args_sam_tweak(
 			fprintf(stderr, "Replacement tag %s is too long.", argument);
 			return false;
 		}
+		return true;
+	case 'R':
+		data->reverse_direction = false;
 		return true;
 	case 'r':
 		data->orphans_file = argument;
@@ -120,7 +125,7 @@ PandaNextSeq panda_args_sam_opener(
 		MAYBE(next_destroy) = NULL;
 		return false;
 	}
-	return panda_create_sam_reader_orphans(data->filename, logger, data->binary, data->tag, data->orphans_file, next_data, next_destroy);
+	return panda_create_sam_reader_ex(data->filename, logger, data->binary, data->tag, data->orphans_file, data->reverse_direction, next_data, next_destroy);
 }
 
 bool panda_args_sam_setup(
@@ -140,8 +145,9 @@ static const panda_tweak_general args_unalign_qual = { 'U', true, "unaligned.txt
 
 const panda_tweak_general args_code = { 'B', true, "code", "Replace the Illumina multiplexing barcode stripped during processing into SAM/BAM.", false };
 
-const panda_tweak_general args_orphans = { 'r', true, "orphans.fastq", "Write all reads from the SAM/BAM that could not be paired or were discarded to a FASTQ file.", false
-};
+const panda_tweak_general args_orphans = { 'r', true, "orphans.fastq", "Write all reads from the SAM/BAM that could not be paired or were discarded to a FASTQ file.", false };
+
+const panda_tweak_general args_reverse_direction = { 'R', true, NULL, "Do not reverse the direction of the reverse read.", false };
 
 static const panda_tweak_general args_unalign = { 'u', true, "unaligned.txt", "File to write unalignable read pairs.", false };
 
@@ -151,6 +157,7 @@ const panda_tweak_general *const panda_args_sam_args[] = {
 	&args_unalign_qual,
 	&args_filename,
 	&args_orphans,
+	&args_reverse_direction,
 	&args_unalign
 };
 

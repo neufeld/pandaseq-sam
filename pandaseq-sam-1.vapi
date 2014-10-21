@@ -25,9 +25,10 @@ namespace Panda.SAM {
 	 * @param binary whether the file is binary (BAM) or text (SAM)
 	 * @param tag a tag to replace the missing Illumina barcoding tag
 	 * @param orphan_file the FASTQ file where unpaired/damaged/broken reads should be place.
+	 * @param reverse_direction reverse the direction of the reverse read. Normally true.
 	 */
-	[CCode (cname = "panda_create_sam_reader_orphans")]
-	public NextSeq? create_reader (string filename, LogProxy logger, bool binary, string? tag = null, string? orphans_file = null);
+	[CCode (cname = "panda_create_sam_reader_ex")]
+	public NextSeq? create_reader (string filename, LogProxy logger, bool binary, string? tag = null, string? orphans_file = null, bool reverse_direction = true);
 	/**
 	 * Create a new assembler for given a SAM file.
 	 * @see create_reader

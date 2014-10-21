@@ -40,16 +40,18 @@ struct reader_data {
 	char tag[PANDA_TAG_LEN];
 	bam_hdr_t *header;
 	FILE *orphan_file;
+	bool reverse_direction;
 };
 
 void ps_fill(
+	bool reverse_direction,
 	bam1_t *bam,
 	panda_qual *seq,
 	size_t *seq_length) {
 	size_t it;
 	*seq_length = bam->core.l_qseq;
 	for (it = 0; it < *seq_length; it++) {
-		size_t pos = (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
+		size_t pos = reverse_direction && (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
 		seq[pos].nt = (panda_nt) (bam_seqi(bam_get_seq(bam), it));
 		seq[pos].qual = bam_get_qual(bam)[it];
 	}
@@ -158,11 +160,11 @@ bool ps_next(
 			memcpy(id->tag, data->tag, data->tag_length + 1);
 
 			if (seq->core.flag & BAM_FREAD1) {
-				ps_fill(seq, data->forward, &data->forward_length);
-				ps_fill(mate, data->reverse, &data->reverse_length);
+				ps_fill(data->reverse_direction, seq, data->forward, &data->forward_length);
+				ps_fill(data->reverse_direction, mate, data->reverse, &data->reverse_length);
 			} else {
-				ps_fill(mate, data->forward, &data->forward_length);
-				ps_fill(seq, data->reverse, &data->reverse_length);
+				ps_fill(data->reverse_direction, mate, data->forward, &data->forward_length);
+				ps_fill(data->reverse_direction, seq, data->reverse, &data->reverse_length);
 			}
 
 			bam_destroy1(seq);
@@ -204,22 +206,13 @@ void ps_destroy(
 	free(data);
 }
 
-PandaNextSeq panda_create_sam_reader(
-	const char *filename,
-	PandaLogProxy logger,
-	bool binary,
-	const char *tag,
-	void **user_data,
-	PandaDestroy *destroy) {
-	return panda_create_sam_reader_orphans(filename, logger, binary, tag, NULL, user_data, destroy);
-}
-
-PandaNextSeq panda_create_sam_reader_orphans(
+PandaNextSeq panda_create_sam_reader_ex(
 	const char *filename,
 	PandaLogProxy logger,
 	bool binary,
 	const char *tag,
 	const char *orphan_file,
+	bool reverse_direction,
 	void **user_data,
 	PandaDestroy *destroy) {
 	struct reader_data *data;
@@ -231,6 +224,7 @@ PandaNextSeq panda_create_sam_reader_orphans(
 	if (data == NULL) {
 		return NULL;
 	}
+	data->reverse_direction = reverse_direction;
 	data->forward = calloc(PANDA_MAX_LEN, sizeof(panda_qual));
 	if (data->forward == NULL) {
 		free(data);
