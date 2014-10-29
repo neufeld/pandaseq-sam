@@ -43,19 +43,20 @@ struct reader_data {
 	bool reverse_direction;
 };
 
-void ps_fill(
+bool ps_fill(
 	bool reverse_direction,
 	bam1_t *bam,
 	panda_qual *seq,
 	size_t *seq_length) {
 	size_t it;
+	bool reverse_index = bam->core.flag & (reverse_direction ? BAM_FREAD2 : BAM_FREVERSE);
 	*seq_length = bam->core.l_qseq;
 	for (it = 0; it < *seq_length; it++) {
-		int flag = reverse_direction ? BAM_FREAD2 : BAM_FREVERSE;
-		size_t pos = (bam->core.flag & flag) ? (*seq_length - it - 1) : it;
+		size_t pos = reverse_index ? (*seq_length - it - 1) : it;
 		seq[pos].nt = (panda_nt) (bam_seqi(bam_get_seq(bam), it));
 		seq[pos].qual = bam_get_qual(bam)[it];
 	}
+	return reverse_index;
 }
 
 bool damaged_seq(
@@ -147,6 +148,7 @@ bool ps_next(
 			kh_value(data->pool, key) = seq;
 			seq = bam_init1();
 		} else {
+			bool swapped;
 			bam1_t *mate = kh_value(data->pool, key);
 			kh_del(seq, data->pool, key);
 
@@ -161,11 +163,17 @@ bool ps_next(
 			memcpy(id->tag, data->tag, data->tag_length + 1);
 
 			if (seq->core.flag & BAM_FREAD1) {
-				ps_fill(data->reverse_direction, seq, data->forward, &data->forward_length);
-				ps_fill(data->reverse_direction, mate, data->reverse, &data->reverse_length);
+				swapped = ps_fill(data->reverse_direction, seq, data->forward, &data->forward_length);
+				swapped ^= ps_fill(data->reverse_direction, mate, data->reverse, &data->reverse_length);
 			} else {
-				ps_fill(data->reverse_direction, mate, data->forward, &data->forward_length);
-				ps_fill(data->reverse_direction, seq, data->reverse, &data->reverse_length);
+				swapped = ps_fill(data->reverse_direction, mate, data->forward, &data->forward_length);
+				swapped ^= ps_fill(data->reverse_direction, seq, data->reverse, &data->reverse_length);
+			}
+			if (!swapped) {
+				panda_log_proxy_write(data->logger, PANDA_CODE_PARSE_FAILURE, NULL, NULL, bam_get_qname(seq));
+				bam_destroy1(seq);
+				bam_destroy1(mate);
+				return false;
 			}
 
 			bam_destroy1(seq);
