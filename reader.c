@@ -51,7 +51,8 @@ void ps_fill(
 	size_t it;
 	*seq_length = bam->core.l_qseq;
 	for (it = 0; it < *seq_length; it++) {
-		size_t pos = reverse_direction && (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
+		int flag = reverse_direction ? BAM_FREAD2 : BAM_FREVERSE;
+		size_t pos = (bam->core.flag & flag) ? (*seq_length - it - 1) : it;
 		seq[pos].nt = (panda_nt) (bam_seqi(bam_get_seq(bam), it));
 		seq[pos].qual = bam_get_qual(bam)[it];
 	}

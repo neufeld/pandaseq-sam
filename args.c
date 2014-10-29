@@ -51,7 +51,7 @@ PandaArgsSam panda_args_sam_new(
 	data->tag[0] = '\0';
 	data->no_algn_qual = false;
 	data->no_algn_writer = NULL;
-	data->reverse_direction = true;
+	data->reverse_direction = false;
 	return data;
 }
 
@@ -77,7 +77,7 @@ bool panda_args_sam_tweak(
 		}
 		return true;
 	case 'R':
-		data->reverse_direction = false;
+		data->reverse_direction = true;
 		return true;
 	case 'r':
 		data->orphans_file = argument;
@@ -147,7 +147,7 @@ const panda_tweak_general args_code = { 'B', true, "code", "Replace the Illumina
 
 const panda_tweak_general args_orphans = { 'r', true, "orphans.fastq", "Write all reads from the SAM/BAM that could not be paired or were discarded to a FASTQ file.", false };
 
-const panda_tweak_general args_reverse_direction = { 'R', true, NULL, "Do not reverse the direction of the reverse read.", false };
+const panda_tweak_general args_reverse_direction = { 'R', true, NULL, "Use the SAM READ1/2 flag to decide direction, not the SAM REVERSE flag.", false };
 
 static const panda_tweak_general args_unalign = { 'u', true, "unaligned.txt", "File to write unalignable read pairs.", false };
 

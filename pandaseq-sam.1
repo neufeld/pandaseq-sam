@@ -35,7 +35,7 @@ Replace the barcode stripped during conversion to SAM/BAM. Multiplexed Illumina 
 The location of the reads in SAM or BAM format. Use \fB-\fR to read from standard input.
 .TP
 \-R
-Normally, the SAM/BAM file holds the reverse read in reverse orientation; that is, it has changed the read such that the orientation of the forward and reverse reads are the same, rather than opposite as they are in FASTQ. This is not universally true. This option causes the reads to be treated like FASTQ reads, in opposite direction, rather than the more typical same orientation. If the reverse primer is not found, it is likely this is the problem.
+Normally, the SAM/BAM file marks the reverse read as \fBreverse\fR in addition to the fact that the two reads are marked as \fBread1\fR and \fBread2\fR. This flag ignores the \fBreverse\fR flag and simply reverses \fBread2\fR.
 .TP
 \-r orphans.fastq
 Writes a FASTQ of all the reads that were rejected by the reader. These were reads that could not be matched to a mate due to either bad SAM flags or the mate being missing from the file. It will also collect any reads that were too long or too short. The SAM flags are printed on the header line in human-readable format.
