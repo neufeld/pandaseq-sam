@@ -40,23 +40,40 @@ struct reader_data {
 	char tag[PANDA_TAG_LEN];
 	bam_hdr_t *header;
 	FILE *orphan_file;
-	bool reverse_direction;
 };
 
+static panda_nt complementary_nt[] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
+
 bool ps_fill(
-	bool reverse_direction,
 	bam1_t *bam,
 	panda_qual *seq,
 	size_t *seq_length) {
 	size_t it;
-	bool reverse_index = bam->core.flag & (reverse_direction ? BAM_FREAD2 : BAM_FREVERSE);
+	/*
+	 * The SAM format is sadistically opaque and the documentation is terrible.
+	 * Here is what seems to be empiracially true about the BAM files generated
+	 * by some sequenceing centres: If BAM_FREVERSE is set, the sequence will be
+	 * reversed _and_ complemented. If the sequence is only marked BAM_FREAD2,
+	 * the sequence is neither reversed nor complemented. PANDAseq's assembler
+	 * expects that the sequences are in their original orientation (i.e., the
+	 * earliest sequenced base of the reverse read has the lowest array position)
+	 * but that the bases in the reverse read have been complemented to match the
+	 * forward read (e.g., an A in the reverse read should match an A in the
+	 * forward read, not a T).
+	 *
+	 * So, if BAM_FREVERSE is set, we reverse the indicies, but do not change the
+	 * bases. If only BAM_FREAD2 is set, we complement but we do not reverse.
+	 */
 	*seq_length = bam->core.l_qseq;
 	for (it = 0; it < *seq_length; it++) {
-		size_t pos = reverse_index ? (*seq_length - it - 1) : it;
+		size_t pos = (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
 		seq[pos].nt = (panda_nt) (bam_seqi(bam_get_seq(bam), it));
+		if ((bam->core.flag & BAM_FREAD2) && !(bam->core.flag & BAM_FREVERSE)) {
+			seq[pos].nt = complementary_nt[(int) seq[pos].nt];
+		}
 		seq[pos].qual = bam_get_qual(bam)[it];
 	}
-	return reverse_index;
+	return bam->core.flag & BAM_FREAD2;
 }
 
 bool damaged_seq(
@@ -163,11 +180,11 @@ bool ps_next(
 			memcpy(id->tag, data->tag, data->tag_length + 1);
 
 			if (seq->core.flag & BAM_FREAD1) {
-				swapped = ps_fill(data->reverse_direction, seq, data->forward, &data->forward_length);
-				swapped ^= ps_fill(data->reverse_direction, mate, data->reverse, &data->reverse_length);
+				swapped = ps_fill(seq, data->forward, &data->forward_length);
+				swapped ^= ps_fill(mate, data->reverse, &data->reverse_length);
 			} else {
-				swapped = ps_fill(data->reverse_direction, mate, data->forward, &data->forward_length);
-				swapped ^= ps_fill(data->reverse_direction, seq, data->reverse, &data->reverse_length);
+				swapped = ps_fill(mate, data->forward, &data->forward_length);
+				swapped ^= ps_fill(seq, data->reverse, &data->reverse_length);
 			}
 			if (!swapped) {
 				panda_log_proxy_write(data->logger, PANDA_CODE_PARSE_FAILURE, NULL, NULL, bam_get_qname(seq));
@@ -221,7 +238,6 @@ PandaNextSeq panda_create_sam_reader_ex(
 	bool binary,
 	const char *tag,
 	const char *orphan_file,
-	bool reverse_direction,
 	void **user_data,
 	PandaDestroy *destroy) {
 	struct reader_data *data;
@@ -233,7 +249,6 @@ PandaNextSeq panda_create_sam_reader_ex(
 	if (data == NULL) {
 		return NULL;
 	}
-	data->reverse_direction = reverse_direction;
 	data->forward = calloc(PANDA_MAX_LEN, sizeof(panda_qual));
 	if (data->forward == NULL) {
 		free(data);

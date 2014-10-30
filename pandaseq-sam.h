@@ -56,33 +56,27 @@ bool panda_seqid_parse_sam(
  *
  * @see: panda_create_sam_reader_ex
  */
-#        define panda_create_sam_reader(filename, logger, binary, tag, user_data, destroy) panda_create_sam_reader_ex(filename, logger, binary, tag, NULL, true, user_data, destroy)
+#        define panda_create_sam_reader(filename, logger, binary, tag, user_data, destroy) panda_create_sam_reader_ex(filename, logger, binary, tag, NULL, user_data, destroy)
 /**
  * Create an object to read sequences from a SAM file with an orphan sequences file
  *
  * @see: panda_create_sam_reader_ex
  */
-#        define panda_create_sam_reader_orphans(filename, logger, binary, tag, orphan_file, user_data, destroy) panda_create_sam_reader_ex(filename, logger, binary, tag, orphan_file, true, user_data, destroy)
-
-/**
- * Create an object to read sequences from a SAM file with an orphan sequences file and control of direction
- *
- * @see: panda_create_sam_reader_ex
- */
-#        define panda_create_sam_reader_orphans_dir(filename, logger, binary, tag, orphan_file, reverse_direction, user_data, destroy) panda_create_sam_reader_ex(filename, logger, binary, tag, orphan_file, reverse_direction, user_data, destroy)
+#        define panda_create_sam_reader_orphans(filename, logger, binary, tag, orphan_file, user_data, destroy) panda_create_sam_reader_ex(filename, logger, binary, tag, orphan_file, user_data, destroy)
 
 /**
  * Create an object to read sequence from a SAM file
  *
- * This API is not guarnateed to be stable.
+ * This API is not guaranteed to be stable. Use one of the alternate forms.
  *
  * @filename: the filename containing paired-end Illumina sequences
  * @logger: the logging to use during assembly
  * @binary: whether the file is binary (BAM) or text (SAM)
  * @tag:(allow-none): a tag to replace the missing Illumina barcoding tag
  * @orphan_file: the FASTQ file where unpaired/damaged/broken reads should be place.
- * @reverse_direction: reverse the direction of the reverse read. Normally true.
  * Returns:(closure user_data) (scope notified): a sequence source callback
+ * @see panda_create_sam_reader
+ * @see panda_create_sam_reader_orphans
  */
 PandaNextSeq panda_create_sam_reader_ex(
 	const char *filename,
@@ -90,7 +84,6 @@ PandaNextSeq panda_create_sam_reader_ex(
 	bool binary,
 	const char *tag,
 	const char *orphan_file,
-	bool reverse_direction,
 	void **user_data,
 	PandaDestroy *destroy);
 /**
