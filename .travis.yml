@@ -2,7 +2,7 @@ language: c
 before_script:
   - sudo apt-add-repository -y ppa:neufeldlab/ppa
   - sudo apt-get update -qq
-  - sudo apt-get install -qq pandaseq-dev libhts-dev
+  - sudo apt-get install -qq -y --force-yes pandaseq-dev libhts-dev
   - ./autogen.sh
 env:
   - OPTIONS=
