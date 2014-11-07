@@ -42,8 +42,6 @@ struct reader_data {
 	FILE *orphan_file;
 };
 
-static panda_nt complementary_nt[] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
-
 bool ps_fill(
 	bam1_t *bam,
 	panda_qual *seq,
@@ -69,7 +67,7 @@ bool ps_fill(
 		size_t pos = (bam->core.flag & BAM_FREVERSE) ? (*seq_length - it - 1) : it;
 		seq[pos].nt = (panda_nt) (bam_seqi(bam_get_seq(bam), it));
 		if ((bam->core.flag & BAM_FREAD2) && !(bam->core.flag & BAM_FREVERSE)) {
-			seq[pos].nt = complementary_nt[(int) seq[pos].nt];
+			seq[pos].nt = panda_nt_complement(seq[pos].nt);
 		}
 		seq[pos].qual = bam_get_qual(bam)[it];
 	}

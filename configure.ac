@@ -17,7 +17,7 @@ else
 fi
 AM_CONDITIONAL([PTHREAD], [test x$acx_pthread_ok = xyes])
 
-PKG_CHECK_MODULES(PANDASEQ, [ pandaseq-2 >= 2.5 ])
+PKG_CHECK_MODULES(PANDASEQ, [ pandaseq-2 >= 2.8 ])
 PKG_CHECK_MODULES(HTS, [ htslib ], [], [
 	ORIGINAL_CFLAGS="$CPPFLAGS"
 	ORIGINAL_LIBS="$LIBS"
