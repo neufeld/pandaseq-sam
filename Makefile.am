@@ -7,6 +7,11 @@ library_include_HEADERS = pandaseq-sam.h
 if PTHREAD
 library_include_HEADERS += pandaseq-sam-mux.h
 endif
+EXTRA_DIST = \
+	README.md \
+	$(dist_vapi_DATA) \
+	$(man1_MANS) \
+	$(NULL)
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = $(LIB_NAME).pc
 vapidir = $(datadir)/vala/vapi
@@ -44,5 +49,8 @@ libpandaseq_sam_la_SOURCES = \
 	reader.c \
 	seqid.c \
 	support.c \
+	$(NULL)
+CLEANFILES = \
+	*.[ch]~ \
 	$(NULL)
 
