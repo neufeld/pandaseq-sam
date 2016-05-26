@@ -23,6 +23,7 @@
 
 #define PARSE_CHUNK if (*input == '\0') return 0; for(;*input != '\0' && *input != ':' && *input != ' '; input++)
 #define PARSE_INT do { value = 0; PARSE_CHUNK { if (*input >= '0' && *input <= '9') { value = 10*value + (*input - '0'); } else { return 0; } } } while(0)
+#define PARSE_PUSH do { if (*input == '\0') return 0; input++; } while(0)
 
 bool panda_seqid_parse_sam(
 	panda_seq_identifier *id,
@@ -45,35 +46,38 @@ bool panda_seqid_parse_sam(
 		PARSE_CHUNK {
 			*dest++ = (*input);
 		}
-		input++;
+		PARSE_PUSH;
 		*dest = '\0';
-		PARSE_INT;
-		input++;
-		id->run = value;
+		dest = id->run;
+		PARSE_CHUNK {
+			*dest++ = (*input);
+		}
+		PARSE_PUSH;
+		*dest = '\0';
 		dest = id->flowcell;
 		PARSE_CHUNK {
 			*dest++ = (*input);
 		}
-		input++;
+		PARSE_PUSH;
 		*dest = '\0';
 	} else {
-		id->run = 0;
+		id->run[0] = '\0';
 		id->flowcell[0] = '\0';
 		dest = id->instrument;
 		PARSE_CHUNK {
 			*dest++ = (*input);
 		}
-		input++;
+		PARSE_PUSH;
 		*dest = '\0';
 	}
 	PARSE_INT;
-	input++;
+	PARSE_PUSH;
 	id->lane = value;
 	PARSE_INT;
-	input++;
+	PARSE_PUSH;
 	id->tile = value;
 	PARSE_INT;
-	input++;
+	PARSE_PUSH;
 	id->x = value;
 	PARSE_INT;
 	id->y = value;
