@@ -1,4 +1,4 @@
-AC_INIT([pandaseq-sam], [1.3], [andre@masella.name])
+AC_INIT([pandaseq-sam], [1.4], [andre@masella.name])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS(config.h)
@@ -17,7 +17,7 @@ else
 fi
 AM_CONDITIONAL([PTHREAD], [test x$acx_pthread_ok = xyes])
 
-PKG_CHECK_MODULES(PANDASEQ, [ pandaseq-2 >= 2.8 ])
+PKG_CHECK_MODULES(PANDASEQ, [ pandaseq-2 >= 2.10 ])
 PKG_CHECK_MODULES(HTS, [ htslib ], [], [
 	ORIGINAL_CFLAGS="$CPPFLAGS"
 	ORIGINAL_LIBS="$LIBS"
