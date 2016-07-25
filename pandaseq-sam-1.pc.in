@@ -11,5 +11,6 @@ Name: PANDAseq-SAM
 Description: Assemble forward and reverse reads from Illumina SAM/BAM data
 Version: @VERSION@
 Requires: pandaseq
+Requires.private: htslib
 Libs: -L${libdir} -lpandaseq-sam
 Cflags: -I${includedir}
